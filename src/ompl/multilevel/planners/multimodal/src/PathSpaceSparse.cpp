@@ -47,6 +47,11 @@ PathSpaceSparse::~PathSpaceSparse()
     delete pathVisibilityChecker_;
 }
 
+bool PathSpaceSparse::hasConverged()
+{
+    return BaseT::hasConverged() && allPathsHaveConverged();
+}
+
 void PathSpaceSparse::setup()
 {
     BaseT::setup();
@@ -66,11 +71,44 @@ void PathSpaceSparse::grow()
         goalConfigurations_.push_back(qgoal);
     }
 
+    //update paths in minima map by doing additional optimization steps
+    //NOTE: this part can be skipped for optimizers which are idempotent (i.e.
+    //Let o be the optimizer and p the path, then o is idempotent if o(p)=o(o(p)))
+
+    std::lock_guard<std::recursive_mutex> 
+      guard(getLocalMinimaTree()->getLock());
+
+    if(getNumberOfPaths()<=0) return;
+
+    unsigned int index = rng_.uniformInt(0, getNumberOfPaths()-1);
+    if(isPathConverged(index)) return;
+
+    ompl::base::PathPtr& path = getPathPtrNonConst(index);
+    geometric::PathGeometric &gpath = 
+      static_cast<geometric::PathGeometric &>(*path);
+
+    optimizePath(gpath);
+
+    double cost = gpath.length(); //TODO: make it arbitrary cost
+
+    updatePath(index, path, cost);
+
+    for (unsigned int i = 0; i < getNumberOfPaths(); i++)
+    {
+        if(i == index) continue;
+        if(!isPathConverged(i)) continue;
+        bool equal = arePathsEquivalent(path, getPathPtr(i));
+        if(equal)
+        {
+            removePath(index);
+            break;
+        }
+    }
 }
 
 ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
 {
-  return getBestPathPtrNonConst();
+    return getBestPathPtrNonConst();
 }
 
 const BundleSpaceGraph::Vertex 
@@ -107,7 +145,6 @@ const std::pair<BundleSpaceGraph::Edge, bool> &edge)
                 {
                     dBest = d;
                     vBest = goal->index;
-                    // std::cout << "Best goal index (d=" << d << "): " << goal->index << std::endl;
                     foundBest = true;
                 }
             }
@@ -120,10 +157,6 @@ const std::pair<BundleSpaceGraph::Edge, bool> &edge)
 const std::pair<BundleSpaceGraph::Edge, bool> 
 PathSpaceSparse::addEdge(const Vertex a, const Vertex b)
 {
-    // std::cout << getStartIndex() << std::endl;
-    // std::cout << getGoalIndex() << std::endl;
-    // std::cout << getNumberOfVertices() << std::endl;
-    // std::cout << a << "," << b << std::endl;
     const std::pair<Edge, bool> edge = BaseT::addEdge(a, b);
 
     const Vertex vStart = getNearestStartVertex(edge);
@@ -194,11 +227,9 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
             //a bit costly, but definitely more efficient than path visibility
             //(which would not only compute distance, but also edge feasibility between
             //path segments). 
-            double d = pathMetric_MaxMin(
-                gpath.getStates(), getPathStates(i), getBundle());
-            // std::cout << "Metric cost difference: " << d << std::endl;
-            OMPL_INFORM("Distance to minima %d is %f", i, d);
-            isVisible = (d < 0.3);
+
+            isVisible = arePathsEquivalent(path, getPathPtr(i));
+
             if (isVisible)
             {
                 if (pathcost < getPathCost(i))
@@ -227,6 +258,26 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
     }
 }
 
+bool PathSpaceSparse::arePathsEquivalent(
+    ompl::base::PathPtr path1,
+    ompl::base::PathPtr path2)
+{
+    // std::cout << "Metric cost difference: " << d << std::endl;
+    geometric::PathGeometric &gpath1 = 
+      static_cast<geometric::PathGeometric &>(*path1);
+    geometric::PathGeometric &gpath2 = 
+      static_cast<geometric::PathGeometric &>(*path2);
+    double d1 = gpath1.length();
+    double d2 = gpath2.length();
+    double dabs = fabs(d1 - d2);
+
+    //Epsilon Equivalent cost 
+    if(dabs > 1e-1) return false;
+
+    double d = pathMetric_MaxMin(
+        gpath1.getStates(), gpath2.getStates(), getBundle());
+    return (d < 0.3); //TODO: Make this a bit more rigorous (how about relating it to epsilon?)
+}
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
     if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)
@@ -235,7 +286,7 @@ void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
         // optimizer_->collapseCloseVertices(gpath);
     }else{
         // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
-        optimizer_->smoothBSpline(gpath);
+        // optimizer_->smoothBSpline(gpath);
         optimizer_->simplifyMax(gpath);
         // optimizer_->reduceVertices(gpath);
         // optimizer_->collapseCloseVertices(gpath);

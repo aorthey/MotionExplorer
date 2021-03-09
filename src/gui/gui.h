@@ -64,7 +64,6 @@ class ForceFieldBackend : public SimTestBackend
     GUIState state;
 };
 
-
 class GLUIForceFieldGUI: public GLUISimTestGUI
 {
   public:

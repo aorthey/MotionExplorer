@@ -3,6 +3,8 @@
 <world>
 
   <robot name="point" file="../../robots/point_nonphysical.urdf"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/sphere.tri" 
+    translation="0 +1 0.5"/>
 
   <plannerinput>
 
@@ -12,7 +14,7 @@
     <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
 
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>60</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.06</pathWidth>
     <pathSpeed>8</pathSpeed>

@@ -14,11 +14,11 @@
     <!-- <qinit  config="9  -0.0 +0.0 +0.0 0.0 0.0 0.0  +0.4 0.0 -0.3"/> -->
     <qgoal  config="11  0 0 0 0 0 0  -3.14 0.0 0.8 0 0"/>
     <epsilongoalregion>0.05</epsilongoalregion>
-    <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>60</maxplanningtime>      <!-- runtime in (s) --> 
     <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>5</pathSpeed>
     <pathWidth>0.2</pathWidth>
-    <!-- <threading>1</threading> -->
+    <threading>1</threading>
 
     <algorithm name="multilevel:minimaspanner"/>
     <algorithm name="multilevel:explorer"/>

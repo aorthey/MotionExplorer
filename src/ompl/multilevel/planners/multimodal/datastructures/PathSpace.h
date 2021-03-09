@@ -23,6 +23,8 @@ namespace ompl
 
             void setLocalMinimaTree(LocalMinimaTreePtr);
 
+            LocalMinimaTreePtr getLocalMinimaTree();
+
             virtual unsigned int getNumberOfPaths() const;
 
             base::PathPtr VerticesToPathPtr(VertexPath vpath);
@@ -45,15 +47,20 @@ namespace ompl
 
             void setup();
 
-            const base::PathPtr& getPathPtr(unsigned int k);
-            const std::vector<BundleSpaceGraph::Vertex> &getPathVertices(unsigned int k);
-            const std::vector<base::State*> &getPathStates(unsigned int k);
-            std::vector<base::State*> &getPathStatesNonConst(unsigned int k);
+            bool isPathConverged(unsigned int k) const;
+
+            bool allPathsHaveConverged() const;
 
             unsigned int getBestPathIndex() const;
             double getBestPathCost() const;
             const base::PathPtr& getBestPathPtr() const;
             base::PathPtr& getBestPathPtrNonConst();
+            const base::PathPtr& getPathPtr(unsigned int k) const;
+            base::PathPtr& getPathPtrNonConst(unsigned int k);
+
+            const std::vector<BundleSpaceGraph::Vertex> &getPathVertices(unsigned int k);
+            const std::vector<base::State*> &getPathStates(unsigned int k);
+            std::vector<base::State*> &getPathStatesNonConst(unsigned int k);
 
         protected:
             BundleSpaceGraph *bundleSpaceGraph_;

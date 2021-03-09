@@ -35,12 +35,27 @@ ompl::multilevel::MultiLevelPathSpace<T>::MultiLevelPathSpace(std::vector<base::
     {
         needPreprocessing = true;
     }
+
+    setExtensionStrategy(ExtensionStrategy::MANUAL);
 }
 
 template <class T>
-ompl::multilevel::MultiLevelPathSpace<T>::~MultiLevelPathSpace()
+MultiLevelPathSpace<T>::~MultiLevelPathSpace()
 {
 }
+
+template<class T>
+void MultiLevelPathSpace<T>::setExtensionStrategy(ExtensionStrategy extensionStrategy)
+{
+    extensionStrategy_ = extensionStrategy;
+}
+
+template<class T>
+ExtensionStrategy MultiLevelPathSpace<T>::getExtensionStrategy()
+{
+    return extensionStrategy_;
+}
+
 
 template <class T>
 void ompl::multilevel::MultiLevelPathSpace<T>::setup()
@@ -67,30 +82,47 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
 {
     ompl::msg::setLogLevel(ompl::msg::LOG_DEV2);
 
-    std::vector<int> selectedLocalMinimum = localMinimaTree_->getSelectedPathIndex();
-    uint K = selectedLocalMinimum.size();
+    //Choice of bundle space to grow depends on extensionstrategy
+    BundleSpace *jBundle;
 
-    if (K >= this->bundleSpaces_.size())
+    if(extensionStrategy_ == ExtensionStrategy::MANUAL)
     {
-        K = K - 1;
-    }
+        std::vector<int> selectedLocalMinimum = localMinimaTree_->getSelectedPathIndex();
+        uint K = selectedLocalMinimum.size();
 
-    // find lowest dimensional QS which has a solution. Then take the next QS to
-    // expand
-    while (K > 0)
-    {
-        if (localMinimaTree_->getNumberOfMinima(K - 1) > 0)
-        {
-            break;
-        }
-        else
+        if (K >= this->bundleSpaces_.size())
         {
             K = K - 1;
         }
-    }
 
-    // Check which
-    BundleSpace *jBundle = static_cast<BundleSpace *>(this->bundleSpaces_.at(K));
+        // find lowest dimensional QS which has a solution. Then take the next QS to
+        // expand
+        while (K > 0)
+        {
+            if (localMinimaTree_->getNumberOfMinima(K - 1) > 0)
+            {
+                break;
+            }
+            else
+            {
+                K = K - 1;
+            }
+        }
+
+        // Check which
+        jBundle = static_cast<BundleSpace *>(this->bundleSpaces_.at(K));
+    }else if(extensionStrategy_ == ExtensionStrategy::AUTOMATIC_BREADTH_FIRST)
+    {
+        OMPL_ERROR("Extension Strategy not yet implemented.");
+        throw "NYI";
+    }else if(extensionStrategy_ == ExtensionStrategy::AUTOMATIC_DEPTH_FIRST)
+    {
+        OMPL_ERROR("Extension Strategy not yet implemented.");
+        throw "NYI";
+    }else{
+        OMPL_ERROR("Extension Strategy is unknown: %d", extensionStrategy_);
+        throw "NYI";
+    }
 
     uint ctr = 0;
 
@@ -102,13 +134,13 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
         bool isInfeasible = jBundle->isInfeasible();
         if (jBundle->isInfeasible())
         {
-            OMPL_DEBUG("Infeasibility detected (level %d).", K);
+            OMPL_DEBUG("Infeasibility detected (level %d).", jBundle->getLevel());
             return ompl::base::PlannerStatus::INFEASIBLE;
         }
 
         if (jBundle->hasConverged())
         {
-            OMPL_DEBUG("Converged (level %d).", K);
+            OMPL_DEBUG("Converged (level %d).", jBundle->getLevel());
             return ompl::base::PlannerStatus::APPROXIMATE_SOLUTION;
         }
         ctr++;

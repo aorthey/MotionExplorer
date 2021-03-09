@@ -40,6 +40,26 @@ void PathPiecewiseLinear::SetDefaultPath()
   }
 }
 
+void PathPiecewiseLinear::setPath(ob::PathPtr path)
+{
+    path = path;
+    og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
+    // gpath.interpolate();
+    std::vector<ob::State *> states = gpath.getStates();
+
+    uint Nstates = std::max(0,(int)states.size()-1);
+    length = 0.0;
+    interLength.clear();
+    for(uint k = 0; k < Nstates; k++)
+    {
+      ob::State *s0 = states.at(k);
+      ob::State *s1 = states.at(k+1);
+      double dk = gpath.getSpaceInformation()->distance(s0,s1);
+      interLength.push_back(dk);
+      length += dk;
+    }
+}
+
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
@@ -50,22 +70,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 
     if(!quotient_space->isDynamic())
     {
-
-      og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
-      // gpath.interpolate();
-      std::vector<ob::State *> states = gpath.getStates();
-
-      uint Nstates = std::max(0,(int)states.size()-1);
-      length = 0.0;
-      for(uint k = 0; k < Nstates; k++)
-      {
-        ob::State *s0 = states.at(k);
-        ob::State *s1 = states.at(k+1);
-        double dk = gpath.getSpaceInformation()->distance(s0,s1);
-        interLength.push_back(dk);
-        length += dk;
-      }
-
+      setPath(path);
     }else{
 
       oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
@@ -188,7 +193,8 @@ void PathPiecewiseLinear::setColor(const GLColor &color)
     this->cLine = color;
 }
 
-void PathPiecewiseLinear::Smooth(bool forceSmoothing){
+void PathPiecewiseLinear::Smooth(bool forceSmoothing)
+{
   if(path == nullptr) return;
   if(quotient_space->isDynamic()) return;
 
@@ -224,7 +230,8 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
   }
 }
 
-void PathPiecewiseLinear::Normalize(){
+void PathPiecewiseLinear::Normalize()
+{
   if(!path) return;
 
   double newLength =0.0;

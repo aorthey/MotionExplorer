@@ -14,6 +14,19 @@ namespace ompl
     {
         OMPL_CLASS_FORWARD(LocalMinimaTree);
 
+        /** \brief Extension Strategy to grow local minima tree.
+         *  AUTOMATIC_BREADTH_FIRST: select a uniform random path 
+         *    on base space for restriction sampling
+         *  AUTOMATIC_DEPTH_FIRST: select best cost path
+         *  MANUAL: let user select path
+         */
+        enum ExtensionStrategy
+        {
+            AUTOMATIC_BREADTH_FIRST = 0,
+            AUTOMATIC_DEPTH_FIRST = 1, 
+            MANUAL = 2
+        };
+
         template <class T>
         class MultiLevelPathSpace : public BundleSpaceSequence<T>
         {
@@ -23,6 +36,7 @@ namespace ompl
             using BaseT = BundleSpaceSequence<T>;
 
         public:
+
             const bool DEBUG{false};
 
             MultiLevelPathSpace(std::vector<base::SpaceInformationPtr> &siVec,
@@ -37,6 +51,11 @@ namespace ompl
 
             LocalMinimaTreePtr &getLocalMinimaTree();
 
+            void setExtensionStrategy(ExtensionStrategy);
+
+            ExtensionStrategy getExtensionStrategy();
+
+
         protected:
             double pathBias{0.8};  //[0,1]
 
@@ -45,6 +64,8 @@ namespace ompl
             bool needPreprocessing = false;
 
             LocalMinimaTreePtr localMinimaTree_;
+
+            ExtensionStrategy extensionStrategy_;
 
         };
     }

@@ -664,6 +664,7 @@ void MotionPlanner::Next()
   if(!active) return;
   if(!hasLocalMinimaTree()) return;
   localMinimaTree_->setSelectedMinimumNext();
+  localMinimaTree_->printSelectedMinimum();
 }
 
 void MotionPlanner::Previous()
@@ -671,6 +672,7 @@ void MotionPlanner::Previous()
   if(!active) return;
   if(!hasLocalMinimaTree()) return;
   localMinimaTree_->setSelectedMinimumPrev();
+  localMinimaTree_->printSelectedMinimum();
 }
 
 void MotionPlanner::Print()
@@ -722,7 +724,7 @@ void MotionPlanner::DrawGL(GUIState& state)
 
   if(hasLocalMinimaTree())
   {
-      std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
+      // std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
       viewLocalMinimaTree_->DrawGL(state);
       DrawGLStartGoal(state);
   }else{

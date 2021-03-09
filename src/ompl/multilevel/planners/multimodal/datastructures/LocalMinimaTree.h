@@ -49,6 +49,11 @@ namespace ompl
                 path_ = path;
                 hasPathPtrRepresentation = true;
                 customRepresentation = nullptr;
+
+                geometric::PathGeometricPtr gpath = 
+                  std::static_pointer_cast<geometric::PathGeometric>(path);
+                spath_ = gpath->getStates();
+                hasStatesRepresentation = true;
             }
 
             const StatesPath &asStates() const;
@@ -61,16 +66,22 @@ namespace ompl
             {
                 cost_ = base::Cost(c);
             }
+
             int getLevel() const
             {
                 return level_;
             }
+
             void setLevel(int level)
             {
                 level_ = level;
             }
 
+            bool isConverged() const;
+
             void *customRepresentation{nullptr};
+
+            int numberOfIdempotentUpdates_{0};
 
         private:
             // content
@@ -96,19 +107,6 @@ namespace ompl
         class LocalMinimaTree
         {
         public:
-            /** \brief Extension Strategy to grow local minima tree.
-             *  AUTOMATIC_BREADTH_FIRST: select a uniform random path 
-             *    on base space for restriction sampling
-             *  AUTOMATIC_DEPTH_FIRST: select best cost path
-             *  MANUAL: let user select path
-             */
-            enum ExtensionStrategy
-            {
-                AUTOMATIC_BREADTH_FIRST = 0,
-                AUTOMATIC_DEPTH_FIRST = 1, 
-                MANUAL = 2
-            };
-
             LocalMinimaTree() = delete;
             LocalMinimaTree(const LocalMinimaTree &) = delete;
             LocalMinimaTree(std::vector<base::SpaceInformationPtr>);
@@ -121,7 +119,8 @@ namespace ompl
             unsigned int getNumberOfLevel() const;
             unsigned int getNumberOfLevelContainingMinima() const;
 
-            const std::vector<base::State *> &getSelectedMinimumAsStateVector(int level) const;
+            const std::vector<base::State *> 
+              &getSelectedMinimumAsStateVector(int level) const;
 
             /* Browser-like functionalities to select minimum (can be
              * mapped to hjkl, arrow keys or mouse buttons) */
@@ -145,17 +144,13 @@ namespace ompl
 
             LocalMinimaNode *addPath(base::PathPtr path, double cost, int level);
             LocalMinimaNode *updatePath(base::PathPtr path, double cost, int level, int index);
+            void removePath(int level, int index);
 
             std::recursive_mutex &getLock();
 
             bool hasChanged();
 
-            void setExtensionStrategy(ExtensionStrategy);
-            ExtensionStrategy getExtensionStrategy();
-
         protected:
-
-            ExtensionStrategy extensionStrategy_;
 
             std::recursive_mutex lock_;
 

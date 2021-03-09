@@ -4,7 +4,9 @@
 
   <robot name="point" file="../../robots/point_nonphysical.urdf"/>
 
-  <!-- <rigidObject name="mobius.tri" file="../../terrains/mobius.tri" translation="0 0 0.5" rotateRPY="0 0 1.57"/> -->
+  <rigidObject name="cylinder_difference" file="../../terrains/primitives/sphere.tri" 
+    translation="0.0 +1.3 -0.3"/>
+
   <plannerinput>
 
     <qinit  config="6  +1.0 +0.2 -0.03 0 0 0"/>
@@ -14,7 +16,7 @@
     <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
 
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>0.001</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.03</pathWidth>
 

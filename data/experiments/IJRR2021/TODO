@@ -1,9 +1,0 @@
-[ ] Integrate KOMO
-[ ] Render Engine
-[ ] (Optional:) Better path visualization
-[x] Maximum metric on fucntional space
-[x] Fix multilevel segfault
-
-[ ] Visualization of minima for multiple robots needs overhauling. Maybe
-time-dependent coloring? Or visualize crossings?
-[ ] 2D->visualize as braids

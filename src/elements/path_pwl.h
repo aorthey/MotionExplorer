@@ -26,6 +26,7 @@ class PathPiecewiseLinear
     PathPiecewiseLinear(CSpaceOMPL *cspace);
     PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace, CSpaceOMPL *quotient_space);
     void SetDefaultPath();
+    void setPath(ob::PathPtr path);
 
     ob::PathPtr GetOMPLPath() const;
 

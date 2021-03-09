@@ -1,6 +1,14 @@
 MOST PRESSING ISSUES:
+
 (1) What to do about non-converged minima?
 (2) Fix multilevel assignment of minima to classes
+
+Colorscheme: Env in light gray. Robot start in dark grey. Paths in light blue.
+Goal position in dark blue. 
+Configuration spaces in light grey (to have similarity to env). Paths there also
+in light blue, goal pos in dark blue. 
+Paths could also be gradient of color (to showcase in which direction the path
+goes!). Then we would color code robot as light blue, end pos as dark(er) blue?
 
 ---- Theory/Algorithmic Tasks
 
@@ -8,9 +16,17 @@ MOST PRESSING ISSUES:
 03D_rod.xml). Ideas are either to do additional sweeps over database to update
 minima over time. Or use visibility checker? Or do nothing: argue that this is a
 problem of the OPTIMIZER. Our job is only to detect it and point it out.
+
 [ ] Relax assumption that optimizer always converges (idempotent).
+
 [ ] Implement the three different modes (call them differently. Extension
 strategy maybe)
+
+[ ] Fix assignment of edges in LMT. We should make sure that they belong to the
+correct minimum.
+
+Sparse roadmap->Generate Candidates->Optimize->Add to Database
+(1) Allocate time budget to optimize database (and compare paths)
 
 ---- Pipeline Tasks
 

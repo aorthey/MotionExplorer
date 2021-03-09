@@ -14,21 +14,10 @@ LocalMinimaTree::LocalMinimaTree(std::vector<base::SpaceInformationPtr> siVec) :
         std::vector<LocalMinimaNode *> kthLevel;
         tree_.push_back(kthLevel);
     }
-    setExtensionStrategy(ExtensionStrategy::MANUAL);
 }
 
 LocalMinimaTree::~LocalMinimaTree()
 {
-}
-
-void LocalMinimaTree::setExtensionStrategy(ExtensionStrategy extensionStrategy)
-{
-  extensionStrategy_ = extensionStrategy;
-}
-
-LocalMinimaTree::ExtensionStrategy LocalMinimaTree::getExtensionStrategy()
-{
-  return extensionStrategy_;
 }
 
 void LocalMinimaTree::clear()
@@ -74,7 +63,7 @@ std::vector<int> LocalMinimaTree::getSelectedPathIndex() const
 
 void LocalMinimaTree::setSelectedPathIndex(std::vector<int> selectedMinimum)
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
     selectedMinimum_ = selectedMinimum;
 }
 
@@ -96,7 +85,7 @@ unsigned int LocalMinimaTree::getNumberOfLevelContainingMinima() const
 
 bool LocalMinimaTree::hasChanged()
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
     if (hasChanged_)
     {
         hasChanged_ = false;
@@ -107,15 +96,33 @@ bool LocalMinimaTree::hasChanged()
         return false;
     }
 }
-LocalMinimaNode *LocalMinimaTree::updatePath(base::PathPtr path, double cost, int level, int index)
+
+bool LocalMinimaNode::isConverged() const
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    return (numberOfIdempotentUpdates_ > 2);
+}
+
+LocalMinimaNode *LocalMinimaTree::updatePath(
+    base::PathPtr path, double cost, int level, int index)
+{
+    std::lock_guard<std::recursive_mutex> guard(getLock());
     sanityCheckLevelIndex(level, index);
 
     LocalMinimaNode *node = tree_.at(level).at(index);
     node->setPathPtr(path);
     node->setLevel(level);
+
+    double costOld = node->getCost();
     node->setCost(cost);
+
+    if(cost < costOld)
+    {
+        node->numberOfIdempotentUpdates_ = 0;
+    }else
+    {
+        node->numberOfIdempotentUpdates_++;
+    }
+
     hasChanged_ = true;
 
     if ((int)selectedMinimum_.size() == level - 1)
@@ -125,9 +132,10 @@ LocalMinimaNode *LocalMinimaTree::updatePath(base::PathPtr path, double cost, in
     return node;
 }
 
-LocalMinimaNode *LocalMinimaTree::addPath(base::PathPtr path, double cost, int level)
+LocalMinimaNode *LocalMinimaTree::addPath(
+    base::PathPtr path, double cost, int level)
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
 
     // base::OptimizationObjectivePtr obj =
     //   std::make_shared<ompl::base::PathLengthOptimizationObjective>(siVec_.at(level));
@@ -149,6 +157,24 @@ LocalMinimaNode *LocalMinimaTree::addPath(base::PathPtr path, double cost, int l
     setSelectedMinimumExpand();
     selectedMinimum_.back() = tree_.at(level).size() - 1;
     return node;
+}
+
+void LocalMinimaTree::removePath(int level, int index)
+{
+    std::lock_guard<std::recursive_mutex> guard(getLock());
+
+    LocalMinimaNode *node = tree_.at(level).at(index);
+    node->customRepresentation = nullptr;
+    if(node) delete node;
+
+    tree_.at(level).erase(tree_.at(level).begin() + index);
+    numberOfMinima_--;
+    hasChanged_ = true;
+
+    setSelectedMinimumNext();
+    setSelectedMinimumPrev();
+
+
 }
 
 LocalMinimaNode *LocalMinimaTree::getPath(int level, int index) const
@@ -209,14 +235,30 @@ double LocalMinimaTree::getPathCost(int level, int index) const
     return node->getCost();
 }
 
-void LocalMinimaTree::setSelectedMinimumPrev()
+void LocalMinimaTree::printSelectedMinimum()
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
-
+    std::lock_guard<std::recursive_mutex> guard(getLock());
     if (selectedMinimum_.size() > 0)
     {
         int level = selectedMinimum_.size() - 1;
-        int maxMinima = getNumberOfMinima(level);
+        int maxMinima = getNumberOfMinima(selectedMinimum_.size() - 1);
+        OMPL_DEVMSG1("Selected local minimum %d/%d (level %d, cost %.2f%s)", 
+          selectedMinimum_.back() + 1, 
+          maxMinima, 
+          level,
+          tree_.at(level).at(selectedMinimum_.back())->getCost(),
+          (tree_.at(level).at(selectedMinimum_.back())->isConverged()?
+           ", [converged]":""));
+    }
+}
+
+void LocalMinimaTree::setSelectedMinimumPrev()
+{
+    std::lock_guard<std::recursive_mutex> guard(getLock());
+
+    if (selectedMinimum_.size() > 0)
+    {
+        int maxMinima = getNumberOfMinima(selectedMinimum_.size() - 1);
         if (maxMinima > 0)
         {
             if (selectedMinimum_.back() > 0)
@@ -227,24 +269,18 @@ void LocalMinimaTree::setSelectedMinimumPrev()
             {
                 selectedMinimum_.back() = maxMinima - 1;
             }
-
-            OMPL_DEVMSG1("Selected local minimum %d/%d (level %d, cost %.2f)", 
-                selectedMinimum_.back() + 1, 
-                maxMinima, 
-                level, 
-                tree_.at(level).at(selectedMinimum_.back())->getCost());
         }
     }
     hasChanged_ = true;
 }
 
+
 void LocalMinimaTree::setSelectedMinimumNext()
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
 
     if (selectedMinimum_.size() > 0)
     {
-        int level = selectedMinimum_.size() - 1;
         int maxMinima = getNumberOfMinima(selectedMinimum_.size() - 1);
         if (maxMinima > 0)
         {
@@ -254,11 +290,6 @@ void LocalMinimaTree::setSelectedMinimumNext()
             }else{
                 selectedMinimum_.back() = 0;
             }
-            OMPL_DEVMSG1("Selected local minimum %d/%d (level %d, cost %.2f)", 
-              selectedMinimum_.back() + 1, 
-              maxMinima, 
-              level,
-              tree_.at(level).at(selectedMinimum_.back())->getCost());
         }
     }
     hasChanged_ = true;
@@ -266,7 +297,7 @@ void LocalMinimaTree::setSelectedMinimumNext()
 
 void LocalMinimaTree::setSelectedMinimumCollapse()
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
 
     if (selectedMinimum_.size() > 0)
     {
@@ -277,7 +308,7 @@ void LocalMinimaTree::setSelectedMinimumCollapse()
 
 void LocalMinimaTree::setSelectedMinimumExpand()
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
 
     unsigned int maxLevel = getNumberOfLevelContainingMinima();
     if (selectedMinimum_.size() < maxLevel)
@@ -289,7 +320,7 @@ void LocalMinimaTree::setSelectedMinimumExpand()
 
 void LocalMinimaTree::setSelectedMinimumExpandFull()
 {
-    std::lock_guard<std::recursive_mutex> guard(lock_);
+    std::lock_guard<std::recursive_mutex> guard(getLock());
 
     unsigned int maxLevel = getNumberOfLevelContainingMinima();
     while (selectedMinimum_.size() < maxLevel)
@@ -299,15 +330,15 @@ void LocalMinimaTree::setSelectedMinimumExpandFull()
     hasChanged_ = true;
 }
 
-void LocalMinimaTree::printSelectedMinimum()
-{
-    for (uint k = 0; k < selectedMinimum_.size(); k++)
-    {
-        std::cout << selectedMinimum_.at(k);
-        std::cout << (k < selectedMinimum_.size() - 1 ? " > " : "");
-    }
-    std::cout << std::endl;
-}
+// void LocalMinimaTree::printSelectedMinimum()
+// {
+//     for (uint k = 0; k < selectedMinimum_.size(); k++)
+//     {
+//         std::cout << selectedMinimum_.at(k);
+//         std::cout << (k < selectedMinimum_.size() - 1 ? " > " : "");
+//     }
+//     std::cout << std::endl;
+// }
 
 const std::vector<ompl::base::State *> &LocalMinimaTree::getSelectedMinimumAsStateVector(int level) const
 {
@@ -341,6 +372,7 @@ const StatesPath &LocalMinimaNode::asStates() const
     OMPL_ERROR("NYI");
     throw ompl::Exception("NYI");
 }
+
 StatesPath &LocalMinimaNode::asStatesNonConst() 
 {
     if (hasStatesRepresentation)
@@ -349,6 +381,7 @@ StatesPath &LocalMinimaNode::asStatesNonConst()
     OMPL_ERROR("NYI");
     throw ompl::Exception("NYI");
 }
+
 const VertexPath &LocalMinimaNode::asVertices() const
 {
     if (hasVertexRepresentation)
@@ -356,6 +389,7 @@ const VertexPath &LocalMinimaNode::asVertices() const
     OMPL_ERROR("NYI");
     throw ompl::Exception("NYI");
 }
+
 LocalMinimaNode::LocalMinimaNode(base::SpaceInformationPtr si, StatesPath &states)
 {
     si_ = si;

@@ -31,208 +31,6 @@ void PlannerBackend::Start(){
 
 
 }
-
-#include <assimp/Exporter.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <KrisLibrary/meshing/PointCloud.h>
-
-void buildAiMesh( 
-    const GLDraw::GeometryAppearance& a, 
-    aiMesh* pMesh) 
-{
-
-//*****************************************************************************
-// Get vertices
-//*****************************************************************************
-		const vector<Vector3>* verts = NULL;
-    if(a.geom->type == AnyGeometry3D::ImplicitSurface) 
-      verts = &a.implicitSurfaceMesh->verts;
-    else if(a.geom->type == AnyGeometry3D::TriangleMesh) 
-      verts = &a.geom->AsTriangleMesh().verts;
-    else if(a.geom->type == AnyGeometry3D::PointCloud) 
-      verts = &a.geom->AsPointCloud().points;
-
-//*****************************************************************************
-// Get color of vertices
-//*****************************************************************************
-    // if(verts) 
-		// {
-			// if(a.vertexColors.size()==verts->size()) 
-			// {
-				// for(size_t i=0;i<verts->size();i++) 
-				// {
-					// const Vector3& v=(*verts)[i];
-					// a.vertexColors[i];
-				// }
-			// }
-		// }
-
-    if(!verts) return;
-
-    uint Nv = verts->size();
-    pMesh->mVertices = new aiVector3D[Nv];
-    pMesh->mNumVertices = Nv;
-    for(uint i=0; i<Nv; i++) 
-    {
-      const Vector3 v = verts->at(i);
-      pMesh->mVertices[i] = aiVector3D(v[0], v[1], v[2]);
-    }
-
-//*****************************************************************************
-// Get faces
-//*****************************************************************************
-    const Meshing::TriMesh* trimesh = NULL;
-    if(a.geom->type == AnyGeometry3D::ImplicitSurface) 
-    trimesh = a.implicitSurfaceMesh;
-    if(a.geom->type == AnyGeometry3D::TriangleMesh) 
-    trimesh = &a.geom->AsTriangleMesh();
-
-    if(!trimesh) return;
-
-    uint Nf = trimesh->tris.size();
-
-    pMesh->mFaces = new aiFace[Nf];
-    pMesh->mNumFaces = Nf;
-
-    for(size_t i=0;i<trimesh->tris.size();i++) 
-    {
-        const IntTriple&t=trimesh->tris[i];
-
-        // if(a.faceColors.size()==trimesh->tris.size())
-        //    a.faceColors[i]
-
-        aiFace& face = pMesh->mFaces[i];
-        face.mIndices = new unsigned int[3];
-        face.mNumIndices = 3;
-        face.mIndices[0] = t.a;
-        face.mIndices[1] = t.b;
-        face.mIndices[2] = t.c;
-    }
-    std::cout << "Add link: " << Nv << " vertices and " << Nf << " faces." << std::endl;
-}
-
-void addAiNode( 
-    const GLDraw::GeometryAppearance& a, 
-    const Matrix4 &mat,
-    const std::string name,
-    std::vector<aiNode*>& nodes,
-    std::vector<aiMesh*>& meshes) 
-{
-    aiMesh* mesh = new aiMesh();
-    mesh->mMaterialIndex = 0;
-    buildAiMesh(a, mesh);
-
-    aiNode *node = new aiNode(name);
-    for(uint row=0; row<4; row++) 
-    {
-      for(uint column=0; column<4; column++) 
-      {
-        node->mTransformation[row][column] = mat(row, column);
-      }
-    }
-
-    node->mMeshes = new unsigned[1];
-    node->mNumMeshes = 1;
-    node->mMeshes[0] = nodes.size();
-    nodes.push_back(node);
-    meshes.push_back(mesh);
-}
-
-void PlannerBackend::ExportToCollada()
-{
-  //TODO: 
-  //[ ] export color as material 
-  //[ ] Add children nodes correctly (not just flat hierarchy)
-  //[x] add correct position offset
-  //[x] add correct node name
-  //[x] iterate over all robots
-  //[x] Add objects/terrains as nodes
-
-//*****************************************************************************
-// Create nodes for each link
-//*****************************************************************************
-  std::vector<aiNode*> nodes;
-  std::vector<aiMesh*> meshes;
-
-  for(size_t i=0;i<world->robots.size();i++) 
-  {
-      if(i!=active_robot) continue;
-      Robot *robot = &sim.odesim.robot(i)->robot;
-
-      for(size_t j=0;j<robot->links.size();j++) 
-      {
-          if(robot->IsGeometryEmpty(j))
-          {
-            continue;
-          }
-          //get geometry (mesh)
-          GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
-          if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
-
-          //get transform (Matrix4)
-          sim.odesim.robot(i)->GetLinkTransform(j,robot->links[j].T_World);
-          Matrix4 mat = robot->links[j].T_World; //frame coordinates
-
-          //build node from mesh+transform
-          addAiNode(a, mat, robot->linkNames[j], nodes, meshes);
-      }
-  }
-  for(size_t i=0;i<world->rigidObjects.size();i++)
-  {
-    RigidObject *obj = world->rigidObjects[i];
-    GLDraw::GeometryAppearance& a = *obj->geometry.Appearance();
-
-    addAiNode(a, obj->T, obj->name, nodes, meshes);
-  }
-  for(size_t i=0;i<world->terrains.size();i++)
-  {
-    Terrain *terra = world->terrains[i];
-    GLDraw::GeometryAppearance& a = *terra->geometry.Appearance();
-    Matrix4 tm; tm.setIdentity();
-    addAiNode(a, tm, terra->name, nodes, meshes);
-  }
-
-//*****************************************************************************
-// Create empty scene
-//*****************************************************************************
-  aiScene scene;
-  scene.mRootNode = new aiNode("root");
-  scene.mMaterials = new aiMaterial *[1];
-  scene.mNumMaterials = 1;
-  scene.mMaterials[0] = new aiMaterial();
-
-  scene.mRootNode->mMeshes = 0;
-  scene.mRootNode->mNumMeshes = 0;
-
-//*****************************************************************************
-// Iterate over all nodes and add them to scene / attach to root
-//*****************************************************************************
-  uint N = nodes.size();
-  scene.mMeshes = new aiMesh *[N]; //pointer array
-  scene.mNumMeshes = N;
-
-  scene.mRootNode->mChildren = new aiNode* [N]; //pointer array
-  scene.mRootNode->mNumChildren = N;
-
-  for(size_t j=0;j<N;j++) 
-  {
-    aiNode *node = nodes.at(j);
-
-    node->mParent = scene.mRootNode;
-    node->mChildren = 0;
-    node->mNumChildren = 0;
-
-    scene.mMeshes[j] = meshes.at(j);
-    scene.mRootNode->mChildren[j] = node;
-  }
-
-  Assimp::Exporter exporter;
-  std::string filename = "scene.dae";
-  exporter.Export(&scene, "collada", filename);
-  std::cout << "Export scene to collada file " << filename << std::endl;
-}
-
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
   if(planners.empty()) return BaseT::OnCommand(cmd, args);
@@ -846,3 +644,220 @@ bool GLUIPlannerGUI::Initialize(){
   return true;
 
 }
+
+#include <assimp/Exporter.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <KrisLibrary/meshing/PointCloud.h>
+
+void buildAiMesh( 
+    const GLDraw::GeometryAppearance& a, 
+    aiMesh* pMesh) 
+{
+
+//*****************************************************************************
+// Get vertices
+//*****************************************************************************
+		const vector<Vector3>* verts = NULL;
+    if(a.geom->type == AnyGeometry3D::ImplicitSurface) 
+      verts = &a.implicitSurfaceMesh->verts;
+    else if(a.geom->type == AnyGeometry3D::TriangleMesh) 
+      verts = &a.geom->AsTriangleMesh().verts;
+    else if(a.geom->type == AnyGeometry3D::PointCloud) 
+      verts = &a.geom->AsPointCloud().points;
+
+//*****************************************************************************
+// Get color of vertices
+//*****************************************************************************
+    // if(verts) 
+		// {
+			// if(a.vertexColors.size()==verts->size()) 
+			// {
+				// for(size_t i=0;i<verts->size();i++) 
+				// {
+					// const Vector3& v=(*verts)[i];
+					// a.vertexColors[i];
+				// }
+			// }
+		// }
+
+    if(!verts) return;
+
+    uint Nv = verts->size();
+    pMesh->mVertices = new aiVector3D[Nv];
+    pMesh->mNumVertices = Nv;
+    for(uint i=0; i<Nv; i++) 
+    {
+      const Vector3 v = verts->at(i);
+      pMesh->mVertices[i] = aiVector3D(v[0], v[1], v[2]);
+    }
+
+//*****************************************************************************
+// Get faces
+//*****************************************************************************
+    const Meshing::TriMesh* trimesh = NULL;
+    if(a.geom->type == AnyGeometry3D::ImplicitSurface) 
+    trimesh = a.implicitSurfaceMesh;
+    if(a.geom->type == AnyGeometry3D::TriangleMesh) 
+    trimesh = &a.geom->AsTriangleMesh();
+
+    if(!trimesh) return;
+
+    uint Nf = trimesh->tris.size();
+
+    pMesh->mFaces = new aiFace[Nf];
+    pMesh->mNumFaces = Nf;
+
+    for(size_t i=0;i<trimesh->tris.size();i++) 
+    {
+        const IntTriple&t=trimesh->tris[i];
+
+        // if(a.faceColors.size()==trimesh->tris.size())
+        //    a.faceColors[i]
+
+        aiFace& face = pMesh->mFaces[i];
+        face.mIndices = new unsigned int[3];
+        face.mNumIndices = 3;
+        face.mIndices[0] = t.a;
+        face.mIndices[1] = t.b;
+        face.mIndices[2] = t.c;
+    }
+    std::cout << "Add link: " << Nv << " vertices and " << Nf << " faces." << std::endl;
+}
+
+void addAiNode( 
+    const GLDraw::GeometryAppearance& a, 
+    const Matrix4 &mat,
+    const std::string name,
+    std::vector<aiNode*>& nodes,
+    std::vector<aiMesh*>& meshes) 
+{
+    aiMesh* mesh = new aiMesh();
+    mesh->mMaterialIndex = 0;
+    buildAiMesh(a, mesh);
+
+    aiNode *node = new aiNode(name);
+    for(uint row=0; row<4; row++) 
+    {
+      for(uint column=0; column<4; column++) 
+      {
+        node->mTransformation[row][column] = mat(row, column);
+      }
+    }
+
+    node->mMeshes = new unsigned[1];
+    node->mNumMeshes = 1;
+    node->mMeshes[0] = nodes.size();
+    nodes.push_back(node);
+    meshes.push_back(mesh);
+}
+
+void PlannerBackend::ExportToCollada()
+{
+  //TODO: 
+  //[ ] export color as material 
+  //[ ] Add children nodes correctly (not just flat hierarchy)
+  //[x] add correct position offset
+  //[x] add correct node name
+  //[x] iterate over all robots
+  //[x] Add objects/terrains as nodes
+
+//*****************************************************************************
+// Create nodes for each link
+//*****************************************************************************
+  // MotionPlanner* planner = planners.at(active_planner);
+  // if(!planner->isActive()) return false;
+  // path = planners.at(active_planner)->GetPath();
+
+  std::vector<aiNode*> nodes;
+  std::vector<aiMesh*> meshes;
+
+  for(size_t i=0;i<world->robots.size();i++) 
+  {
+      if(i!=active_robot) continue;
+      Robot *robot = &sim.odesim.robot(i)->robot;
+
+      for(size_t j=0;j<robot->links.size();j++) 
+      {
+          if(robot->IsGeometryEmpty(j))
+          {
+            continue;
+          }
+          //get geometry (mesh)
+          GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
+          if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
+
+          //get transform (Matrix4)
+          sim.odesim.robot(i)->GetLinkTransform(j,robot->links[j].T_World);
+          Matrix4 mat = robot->links[j].T_World; //frame coordinates
+
+          //build node from mesh+transform
+          addAiNode(a, mat, robot->linkNames[j], nodes, meshes);
+      }
+  }
+
+  for(size_t i=0;i<world->rigidObjects.size();i++)
+  {
+    RigidObject *obj = world->rigidObjects[i];
+    GLDraw::GeometryAppearance& a = *obj->geometry.Appearance();
+
+    addAiNode(a, obj->T, obj->name, nodes, meshes);
+  }
+
+  for(size_t i=0;i<world->terrains.size();i++)
+  {
+    Terrain *terra = world->terrains[i];
+    GLDraw::GeometryAppearance& a = *terra->geometry.Appearance();
+    Matrix4 tm; tm.setIdentity();
+    addAiNode(a, tm, terra->name, nodes, meshes);
+  }
+
+//*****************************************************************************
+// Create empty scene
+//*****************************************************************************
+  aiScene scene;
+  scene.mRootNode = new aiNode("root");
+  scene.mMaterials = new aiMaterial *[1];
+  scene.mNumMaterials = 1;
+  scene.mMaterials[0] = new aiMaterial();
+
+  scene.mRootNode->mMeshes = 0;
+  scene.mRootNode->mNumMeshes = 0;
+
+  aiCamera *camera = new aiCamera();
+  camera->mName = "camera";
+
+  scene.mNumCameras = 1;
+  scene.mCameras[0] = camera;
+  std::cout << viewport.x << std::endl;
+  exit(0);
+
+
+//*****************************************************************************
+// Iterate over all nodes and add them to scene / attach to root
+//*****************************************************************************
+  uint N = nodes.size();
+  scene.mMeshes = new aiMesh *[N]; //pointer array
+  scene.mNumMeshes = N;
+
+  scene.mRootNode->mChildren = new aiNode* [N]; //pointer array
+  scene.mRootNode->mNumChildren = N;
+
+  for(size_t j=0;j<N;j++) 
+  {
+    aiNode *node = nodes.at(j);
+
+    node->mParent = scene.mRootNode;
+    node->mChildren = 0;
+    node->mNumChildren = 0;
+
+    scene.mMeshes[j] = meshes.at(j);
+    scene.mRootNode->mChildren[j] = node;
+  }
+
+  Assimp::Exporter exporter;
+  std::string filename = "scene.dae";
+  exporter.Export(&scene, "collada", filename);
+  std::cout << "Export scene to collada file " << filename << std::endl;
+}
+
