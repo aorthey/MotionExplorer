@@ -149,6 +149,16 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
 }
 
 template <class T>
+bool MultiLevelPathSpace<T>::hasConverged()
+{
+    for(uint k = 0; k < this->bundleSpaces_.size(); k++)
+    {
+        if(!this->bundleSpaces_.at(k)->hasConverged()) return false;
+    }
+    return true;
+}
+
+template <class T>
 void MultiLevelPathSpace<T>::getPlannerData(base::PlannerData &data) const
 {
     // TODO: just call BaseT (better: remove completely)

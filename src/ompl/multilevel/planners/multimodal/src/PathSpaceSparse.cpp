@@ -282,7 +282,7 @@ void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
     if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)
     {
-        std::cout << "SO2 detected. Optimizer disabled." << std::endl;
+        // std::cout << "SO2 detected. Optimizer disabled." << std::endl;
         // optimizer_->collapseCloseVertices(gpath);
     }else{
         // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);

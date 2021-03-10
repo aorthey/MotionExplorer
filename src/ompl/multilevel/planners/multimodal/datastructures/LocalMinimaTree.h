@@ -1,6 +1,7 @@
 #ifndef OMPL_MULTILEVEL_PLANNERS_MULTIMODAL_LOCALMINIMATREE_
 #define OMPL_MULTILEVEL_PLANNERS_MULTIMODAL_LOCALMINIMATREE_
 
+#include "elements/path_pwl.h"
 #include <ompl/util/ClassForward.h>
 #include <ompl/base/State.h>
 #include <ompl/base/Cost.h>
@@ -13,6 +14,7 @@ namespace ompl
     namespace base
     {
         OMPL_CLASS_FORWARD(SpaceInformation);
+        OMPL_CLASS_FORWARD(StateSpace);
         OMPL_CLASS_FORWARD(Path);
     }
     namespace geometric
@@ -31,6 +33,7 @@ namespace ompl
             LocalMinimaNode(base::SpaceInformationPtr si, base::PathPtr path);
             LocalMinimaNode(base::SpaceInformationPtr si, StatesPath &states);
             LocalMinimaNode(base::SpaceInformationPtr si, VertexPath &vertices);
+            ~LocalMinimaNode();
 
             double getCost() const
             {
@@ -41,14 +44,12 @@ namespace ompl
             {
                 vpath_ = vertices;
                 hasVertexRepresentation = true;
-                customRepresentation = nullptr;
             }
 
             void setPathPtr(base::PathPtr path)
             {
                 path_ = path;
                 hasPathPtrRepresentation = true;
-                customRepresentation = nullptr;
 
                 geometric::PathGeometricPtr gpath = 
                   std::static_pointer_cast<geometric::PathGeometric>(path);
@@ -77,15 +78,38 @@ namespace ompl
                 level_ = level;
             }
 
+            int getId() const
+            {
+              return id_;
+            }
+            //XML routines
+            void init();
+            // void update();
+            // void finish();
+            // void saveXML(TiXmlElement*);
+
             bool isConverged() const;
 
-            void *customRepresentation{nullptr};
+            // void *customRepresentation{nullptr};
+            PathPiecewiseLinear *customRepresentation{nullptr};
 
             int numberOfIdempotentUpdates_{0};
 
         private:
             // content
             base::Cost cost_;
+
+            static int id_counter;
+            int id_; //required to track history of added/removed paths
+
+            //Export files (we might outsource this later on)
+            bool export_{false};
+            // int numberOfUpdates_{0};
+            // TiXmlDocument xmlDoc_;
+            // TiXmlElement *xmlNode_;
+            // ompl::time::point timePointStart;
+            // ompl::time::point timePointEnd;
+            // std::vector<int> updateTimes_;
 
             int level_;
 
@@ -114,6 +138,8 @@ namespace ompl
 
             void clear();
 
+            bool isConverged() const;
+
             unsigned int getNumberOfMinima(unsigned int level) const;
             unsigned int getNumberOfMinima() const;
             unsigned int getNumberOfLevel() const;
@@ -140,6 +166,9 @@ namespace ompl
             void setSelectedPathIndex(std::vector<int> index);
             std::vector<LocalMinimaNode *> getSelectedPathSiblings() const;
 
+            /* \brief Return all paths on a given level */
+            std::vector<LocalMinimaNode *> getPaths(int level) const;
+
             void sanityCheckLevelIndex(int level, int index) const;
 
             LocalMinimaNode *addPath(base::PathPtr path, double cost, int level);
@@ -147,6 +176,7 @@ namespace ompl
             void removePath(int level, int index);
 
             std::recursive_mutex &getLock();
+            std::mutex &getNonRecursiveLock();
 
             bool hasChanged();
 

@@ -10,6 +10,7 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/control/PathControl.h>
+#include <ompl/util/Time.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
@@ -25,44 +26,14 @@ using namespace GLDraw;
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
   cspace(cspace_), quotient_space(cspace_)
 {
+  initExport();
   SetDefaultPath();
-}
-void PathPiecewiseLinear::SetDefaultPath()
-{
-  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-  if(quotient_space->isDynamic())
-  {
-    path = std::make_shared<oc::PathControl>(si);
-    path_raw = std::make_shared<oc::PathControl>(si);
-  }else{
-    path = std::make_shared<og::PathGeometric>(si);
-    path_raw = std::make_shared<og::PathGeometric>(si);
-  }
-}
-
-void PathPiecewiseLinear::setPath(ob::PathPtr path)
-{
-    path = path;
-    og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
-    // gpath.interpolate();
-    std::vector<ob::State *> states = gpath.getStates();
-
-    uint Nstates = std::max(0,(int)states.size()-1);
-    length = 0.0;
-    interLength.clear();
-    for(uint k = 0; k < Nstates; k++)
-    {
-      ob::State *s0 = states.at(k);
-      ob::State *s1 = states.at(k+1);
-      double dk = gpath.getSpaceInformation()->distance(s0,s1);
-      interLength.push_back(dk);
-      length += dk;
-    }
 }
 
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
+  initExport();
   if(p_ == nullptr)
   {
     SetDefaultPath();
@@ -70,7 +41,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 
     if(!quotient_space->isDynamic())
     {
-      setPath(path);
+      setPath(path, true);
     }else{
 
       oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
@@ -104,6 +75,116 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
   // std::cout << *this << std::endl;
 }
 
+PathPiecewiseLinear::~PathPiecewiseLinear()
+{
+  timePointEnd = ompl::time::now();
+  ompl::time::duration timeDuration = timePointEnd - timePointStart;
+  double duration = ompl::time::seconds(timeDuration);
+  int timeInt = int(duration*25.0);
+
+  TiXmlElement* node = new TiXmlElement("removal");
+  node->SetAttribute("time", to_string(timeInt));
+  xmlNode_->InsertEndChild(*node);
+
+  Export("path", id_);
+}
+
+void PathPiecewiseLinear::initExport()
+{
+  if(export_)
+  {
+      // timePointStart = ompl::time::now();
+      std::cout << "Init Export" << std::endl;
+      xmlNode_ = CreateRootNodeInDocument(xmlDoc_);
+      xmlNode_->SetValue("path");
+      AddComment(*xmlNode_, "This file contains the evolution of a path over time. A path is represented by a sequence of states and a time index.");
+  }
+}
+
+void PathPiecewiseLinear::Export(const char *fn, int id)
+{
+  if(export_)
+  {
+     xmlDoc_.LinkEndChild(xmlNode_);
+     std::string fn = "disk_curve"+std::to_string(id)+".path";
+
+     xmlDoc_.SaveFile(fn);
+     std::cout << std::string(80, '-') << std::endl;
+     std::cout << "SAVE curve file to " << fn << std::endl;
+     std::cout << std::string(80, '-') << std::endl;
+  }
+}
+
+void PathPiecewiseLinear::SetDefaultPath()
+{
+  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+  if(quotient_space->isDynamic())
+  {
+    path = std::make_shared<oc::PathControl>(si);
+    path_raw = std::make_shared<oc::PathControl>(si);
+  }else{
+    path = std::make_shared<og::PathGeometric>(si);
+    path_raw = std::make_shared<og::PathGeometric>(si);
+  }
+  if(export_)
+  {
+      xmlNode_ = CreateRootNodeInDocument(xmlDoc_);
+      xmlNode_->SetValue("path");
+      AddComment(*xmlNode_, "This file contains the evolution of a path over time. A path is represented by a sequence of states and a time index.");
+  }
+}
+
+void PathPiecewiseLinear::setPath(ob::PathPtr path_input, bool force_set_path)
+{
+    // if(path != path_input || force_set_path)
+    // {
+        path = path_input;
+        og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
+        // gpath.interpolate();
+        std::vector<ob::State *> states = gpath.getStates();
+
+        uint Nstates = std::max(0,(int)states.size()-1);
+        length = 0.0;
+        interLength.clear();
+        for(uint k = 0; k < Nstates; k++)
+        {
+          ob::State *s0 = states.at(k);
+          ob::State *s1 = states.at(k+1);
+          double dk = gpath.getSpaceInformation()->distance(s0,s1);
+          interLength.push_back(dk);
+          length += dk;
+        }
+        // assert(interLength.size()==states.size()-1);
+
+        if(export_)
+        {
+            timePointEnd = ompl::time::now();
+            ompl::time::duration timeDuration = timePointEnd - timePointStart;
+            double duration = ompl::time::seconds(timeDuration);
+            int timeInt = int(duration*25.0);
+            std::string time = std::to_string(timeInt);
+            std::cout << "Adding at time: " << time << " duration: " << duration<< std::endl;
+            if(timeInt<0)
+            {
+              std::cout << "Time smaller zero: " << time << std::endl;
+              exit(0);
+            }
+
+            bool timeExist = (std::find(updateTimes_.begin(), updateTimes_.end(), timeInt) != updateTimes_.end());
+
+            if(timeExist) return;
+            updateTimes_.push_back(timeInt);
+
+            TiXmlElement* node = new TiXmlElement("keyframe");
+            Save(node);
+            node->SetAttribute("time", time);
+            node->SetValue("keyframe");
+            std::cout << "New keyframe added at time: " << time << std::endl;
+            xmlNode_->InsertEndChild(*node);
+        }
+    // }
+
+}
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
 {
   return path;
@@ -1115,7 +1196,7 @@ bool PathPiecewiseLinear::Save(const char* fn)
 
 bool PathPiecewiseLinear::Save(TiXmlElement *node)
 {
-  node->SetValue("path_piecewise_linear");
+  node->SetValue("path");
   AddSubNode(*node, "length", length);
   if(!path) return true; //saving zero length path is ok
 
@@ -1179,9 +1260,11 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
       ob::StateSpacePtr space = si->getStateSpace();
       std::vector<ob::State *> states = gpath.getStates();
       for(uint k = 0; k < states.size(); k++){
-        std::vector<double> state_k_serialized;
-        space->copyToReals(state_k_serialized, states.at(k));
-        AddSubNodeVector(*node, "state", state_k_serialized);
+        // std::vector<double> state_k_serialized;
+        // space->copyToReals(state_k_serialized, states.at(k));
+        Config qk = quotient_space->OMPLStateToConfig(states.at(k));
+        std::vector<double> q_serialized = qk;
+        AddSubNodeVector(*node, "state", q_serialized);
       }
     }
 
@@ -1194,9 +1277,12 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
         ob::StateSpacePtr space = si->getStateSpace();
         std::vector<ob::State *> states = gpath.getStates();
         for(uint k = 0; k < states.size(); k++){
-          std::vector<double> state_k_serialized;
-          space->copyToReals(state_k_serialized, states.at(k));
-          AddSubNodeVector(*node, "rawstate", state_k_serialized);
+          // std::vector<double> state_k_serialized;
+          // space->copyToReals(state_k_serialized, states.at(k));
+          // AddSubNodeVector(*node, "rawstate", state_k_serialized);
+          Config qk = quotient_space->OMPLStateToConfig(states.at(k));
+          std::vector<double> q_serialized = qk;
+          AddSubNodeVector(*node, "rawstate", q_serialized);
         }
       }
     }

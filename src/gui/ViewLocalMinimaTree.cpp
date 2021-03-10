@@ -48,8 +48,13 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
   if(node->customRepresentation == nullptr)
   {
       auto path = node->asPathPtr();
+      std::cout << "Create new representation for node " << node->getId() << std::endl;
       PathPiecewiseLinear *pwl = new PathPiecewiseLinear(path, cspace_levels_.back(),
           cspace_levels_.at(level));
+      pwl->timePointStart = timePointStart;
+      pwl->export_ = true;
+      pwl->id_ = node->getId();
+      pwl->initExport();
       node->customRepresentation = pwl;
   }
 
@@ -75,6 +80,10 @@ void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode*
       auto path = node->asPathPtr();
       PathPiecewiseLinear *pwl = new PathPiecewiseLinear(path, cspace_levels_.back(),
           cspace_levels_.at(node->getLevel()));
+      pwl->timePointStart = timePointStart;
+      pwl->export_ = true;
+      pwl->id_ = node->getId();
+      pwl->initExport();
       node->customRepresentation = pwl;
   }
 
@@ -91,10 +100,30 @@ void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode*
   pathUnselected->DrawGL(state);
 
 }
+
+void ViewLocalMinimaTree::Save(const char* fn)
+{
+  int level = localMinimaTree_->getSelectedPath()->getLevel();
+  std::vector<LocalMinimaNode*> nodeVector = localMinimaTree_->getPaths(level);
+  std::cout << "Saving local minima curves for level "<< level 
+   << " ("<<nodeVector.size() << " minima)." << std::endl;
+  for(uint k = 0; k < nodeVector.size(); k++)
+  {
+    LocalMinimaNode *node = nodeVector.at(k);
+    if(node->customRepresentation != nullptr)
+    {
+      PathPiecewiseLinear *path = 
+        static_cast<PathPiecewiseLinear*>(node->customRepresentation);
+      path->Export("", node->getId());
+      path->export_ = false;
+    }else{
+      std::cout << "No customRepresentation" << std::endl;
+    }
+  }
+}
+
 void ViewLocalMinimaTree::DrawGL(GUIState& state)
 {
-  // std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
-
   LocalMinimaNode* node = localMinimaTree_->getSelectedPath();
 
   if(node == nullptr) return;
@@ -109,7 +138,6 @@ void ViewLocalMinimaTree::DrawGL(GUIState& state)
       DrawGLNodeUnSelected(state, nodeVector.at(k));
     }
   }
-
 }
 
 void ViewLocalMinimaTree::DrawGLScreen(double x, double y)

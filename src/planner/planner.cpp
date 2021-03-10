@@ -37,7 +37,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   }else{
     strategy = std::make_shared<StrategyGeometricMultiLevel>();
   }
-  timePointStart = ompl::time::now();
+  resetTime();
 
   CreateHierarchy();
 }
@@ -724,9 +724,20 @@ void MotionPlanner::DrawGL(GUIState& state)
 
   if(hasLocalMinimaTree())
   {
-      // std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
       viewLocalMinimaTree_->DrawGL(state);
       DrawGLStartGoal(state);
+
+      auto pathSpacePlanner = 
+        static_pointer_cast<ompl::multilevel::LocalMinimaSpanners>(strategy->GetPlannerPtr());
+      static bool isSaved = false;
+      if(!isSaved && pathSpacePlanner->hasConverged())
+      {
+          std::string name = util::GetFileBasename(input.environment_name);
+          std::string fname = util::GetDataFolder()+"/localminimatree/"+name+".tree";
+          viewLocalMinimaTree_->Save(fname.c_str());
+          isSaved = true;
+      }
+
   }else{
       DrawGLStartGoal(state);
   }
@@ -832,6 +843,10 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
 void MotionPlanner::resetTime()
 {
   timePointStart = ompl::time::now();
+  if(hasLocalMinimaTree())
+  {
+    viewLocalMinimaTree_->timePointStart = timePointStart;
+  }
 }
 
 int MotionPlanner::getCurrentLevel() const

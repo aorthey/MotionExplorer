@@ -56,6 +56,8 @@ class ViewLocalMinimaTree
     GLDraw::GLColor nodeSelectedColor;
     GLDraw::GLColor nodeUnselectedColor;
 
+    ompl::time::point timePointStart;
+
     PathPiecewiseLinear *getPathSelected();
     void DrawGL(GUIState& state);
     void DrawGLScreen(double x, double y);
@@ -65,6 +67,8 @@ class ViewLocalMinimaTree
 
     void DrawGLNodeUnSelected(GUIState& state, ompl::multilevel::LocalMinimaNode* node);
     void DrawGLNodeSelected(GUIState& state, ompl::multilevel::LocalMinimaNode* node);
+
+    void Save(const char* fn);
   private:
     PathPiecewiseLinear *pathSelected_;
     ompl::multilevel::LocalMinimaTreePtr localMinimaTree_;

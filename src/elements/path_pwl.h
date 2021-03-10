@@ -3,6 +3,7 @@
 #include "gui/colors.h"
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/control/PathControl.h>
+#include <ompl/util/Time.h>
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
 #include <Library/KrisLibrary/utils/SmartPointer.h>
@@ -25,8 +26,9 @@ class PathPiecewiseLinear
     PathPiecewiseLinear() = delete;
     PathPiecewiseLinear(CSpaceOMPL *cspace);
     PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace, CSpaceOMPL *quotient_space);
+    virtual ~PathPiecewiseLinear();
     void SetDefaultPath();
-    void setPath(ob::PathPtr path);
+    void setPath(ob::PathPtr path, bool force_set_path=false);
 
     ob::PathPtr GetOMPLPath() const;
 
@@ -70,6 +72,10 @@ class PathPiecewiseLinear
     bool draw_planar{false};
     std::vector<double> GetHighCurvatureConfigurations();
 
+    bool export_{false};
+    void Export(const char *fn="", int id = 0);
+    void initExport();
+
     bool Load(const char *fn);
     bool Load(TiXmlElement* node);
     bool Save(const char *fn);
@@ -78,7 +84,16 @@ class PathPiecewiseLinear
 
     void SendToController(SmartPointer<RobotController> controller);
 
+    ompl::time::point timePointStart;
+    ompl::time::point timePointEnd;
+
+    int id_;
   protected:
+
+    TiXmlDocument xmlDoc_;
+    TiXmlElement *xmlNode_;
+    std::vector<int> updateTimes_;
+
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
 

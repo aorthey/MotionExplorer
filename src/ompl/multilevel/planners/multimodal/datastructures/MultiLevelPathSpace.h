@@ -51,6 +51,8 @@ namespace ompl
 
             LocalMinimaTreePtr &getLocalMinimaTree();
 
+            bool hasConverged();
+
             void setExtensionStrategy(ExtensionStrategy);
 
             ExtensionStrategy getExtensionStrategy();

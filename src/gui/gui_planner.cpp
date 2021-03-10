@@ -765,9 +765,6 @@ void PlannerBackend::ExportToCollada()
 //*****************************************************************************
 // Create nodes for each link
 //*****************************************************************************
-  // MotionPlanner* planner = planners.at(active_planner);
-  // if(!planner->isActive()) return false;
-  // path = planners.at(active_planner)->GetPath();
 
   std::vector<aiNode*> nodes;
   std::vector<aiMesh*> meshes;
@@ -824,14 +821,37 @@ void PlannerBackend::ExportToCollada()
   scene.mRootNode->mMeshes = 0;
   scene.mRootNode->mNumMeshes = 0;
 
+//*****************************************************************************
+// Create camera and light
+//*****************************************************************************
   aiCamera *camera = new aiCamera();
-  camera->mName = "camera";
+  camera->mName = "myCamera";
+
+  Vector3 pos;
+  Vector3 tgt;
+  Vector3 up;
+  viewport.getTarget(pos, tgt, up);
+
+  camera->mPosition = aiVector3D(pos[0], pos[1], pos[2]);
+  camera->mLookAt = aiVector3D(tgt[0], tgt[1], tgt[2]);
+  camera->mUp = aiVector3D(up[0], up[1], up[2]);
+
+  // std::cout << "Camera pos:" << pos << std::endl;
+  // std::cout << "Camera tgt:" << tgt << std::endl;
+
+  aiLight *light = new aiLight();
+  light->mName = "light-source";
+  light->mType = aiLightSource_POINT;
+  light->mPosition = aiVector3D(0,0,1);
+  light->mDirection = aiVector3D(0,0,-1);
+
+  scene.mNumLights = 1;
+  scene.mLights = new aiLight *[1];
+  scene.mLights[0] = light;
 
   scene.mNumCameras = 1;
+  scene.mCameras = new aiCamera *[1];
   scene.mCameras[0] = camera;
-  std::cout << viewport.x << std::endl;
-  exit(0);
-
 
 //*****************************************************************************
 // Iterate over all nodes and add them to scene / attach to root
@@ -840,8 +860,9 @@ void PlannerBackend::ExportToCollada()
   scene.mMeshes = new aiMesh *[N]; //pointer array
   scene.mNumMeshes = N;
 
-  scene.mRootNode->mChildren = new aiNode* [N]; //pointer array
-  scene.mRootNode->mNumChildren = N;
+  uint M = scene.mNumCameras + scene.mNumLights;
+  scene.mRootNode->mChildren = new aiNode* [N+M]; //pointer array
+  scene.mRootNode->mNumChildren = N+M;
 
   for(size_t j=0;j<N;j++) 
   {
@@ -854,7 +875,109 @@ void PlannerBackend::ExportToCollada()
     scene.mMeshes[j] = meshes.at(j);
     scene.mRootNode->mChildren[j] = node;
   }
+  uint j = N;
+  for(uint k = 0; k < scene.mNumCameras; k++)
+  {
+    aiMatrix4x4 mat;
+    scene.mCameras[k]->GetCameraMatrix(mat);
+    std::cout << "TODO: camera position not computed correctly." << std::endl;
 
+    std::string sk = scene.mCameras[k]->mName.C_Str();
+    aiNode *cameraNode = new aiNode(sk);
+    cameraNode->mMeshes = 0;
+    cameraNode->mNumMeshes = 0;
+    cameraNode->mTransformation = mat;
+    scene.mRootNode->mChildren[j++] = cameraNode;
+    // for(uint row=0; row<4; row++) 
+    // {
+    //   for(uint column=0; column<4; column++) 
+    //   {
+    //     node->mTransformation[row][column] = mat(row, column);
+    //   }
+    // }
+  }
+  for(uint k = 0; k < scene.mNumLights; k++)
+  {
+    std::string sk = scene.mLights[k]->mName.C_Str();
+    aiNode *lightNode = new aiNode(sk);
+    std::cout << "TODO: light source is correctly placed. But cannot change strength." << std::endl;
+    lightNode->mMeshes = 0;
+    lightNode->mNumMeshes = 0;
+    scene.mRootNode->mChildren[j++] = lightNode;
+
+    // aiMatrix4x4 mat;
+    lightNode->mTransformation[0][3] = scene.mLights[k]->mPosition[0];
+    lightNode->mTransformation[1][3] = scene.mLights[k]->mPosition[1];
+    lightNode->mTransformation[2][3] = scene.mLights[k]->mPosition[2];
+  }
+//*****************************************************************************
+// Create animations
+//*****************************************************************************
+  std::cout << "WARNING: animation is not exported." << std::endl;
+  aiAnimation *animation = new aiAnimation();
+  animation->mName = "translate";
+  animation->mDuration = 100;
+  animation->mTicksPerSecond = 25;
+
+
+  // animation->mNumMeshChannels = scene.mNumMeshChannels;
+  // animation->mMeshChannels = new aiNodeAnim *[scene.mNumMeshChannels];
+  // // animation->mMeshChannels[0] = rootNodeAnimation;
+
+  // for(uint k = 0; k < scene.mNumMeshes; k++)
+  // {
+  //   aiMeshAnim *meshAnim = new aiMeshAnim();
+  //   meshAnim->mName = scene.mMeshes[k]->mName;
+  //   meshAnim->mNumKeys = 10;
+  //   meshAnim->mKeys = new aiMeshKey[10];
+  //   for(uint j = 0; j < 10; j++)
+  //   {
+  //     meshAnim->mKeys[j]->mTime = j;
+  //     meshAnim->mKeys[j]->mValue = j;
+  //   }
+
+  //   animation->mMeshChannels[k] = meshAnim;
+  // }
+
+  //Scaling and rotation are required
+  aiNodeAnim *rootNodeAnimation = new aiNodeAnim();
+  rootNodeAnimation->mNodeName = "myCamera";
+  uint Nt = 100;
+  rootNodeAnimation->mNumPositionKeys = Nt;
+  rootNodeAnimation->mPositionKeys = new aiVectorKey[Nt];
+  rootNodeAnimation->mNumScalingKeys = Nt;
+  rootNodeAnimation->mScalingKeys = new aiVectorKey[Nt];//(0, vs);
+  rootNodeAnimation->mNumRotationKeys = Nt;
+  rootNodeAnimation->mRotationKeys = new aiQuatKey[Nt];//(0, vq);
+
+  aiVector3D vs(1,1,1);
+  aiQuaternion vq;
+  for(uint k = 0; k < Nt; k++)
+  {
+    aiVector3D v(0.1*k,0,0);
+    rootNodeAnimation->mPositionKeys[k].mTime = k;
+    rootNodeAnimation->mPositionKeys[k].mValue = v;
+    rootNodeAnimation->mScalingKeys[k].mTime = k;
+    rootNodeAnimation->mScalingKeys[k].mValue = vs;
+    rootNodeAnimation->mRotationKeys[k].mTime = k;
+    rootNodeAnimation->mRotationKeys[k].mValue = vq;
+  }
+
+  animation->mNumChannels = 1;
+  animation->mChannels = new aiNodeAnim *[1];
+  animation->mChannels[0] = rootNodeAnimation;
+
+  scene.mNumAnimations = 1;
+  scene.mAnimations = new aiAnimation *[1];
+  scene.mAnimations[0] = animation;
+
+  // MotionPlanner* planner = planners.at(active_planner);
+  // if(!planner->isActive()) return false;
+  // path = planners.at(active_planner)->GetPath();
+
+//*****************************************************************************
+// Export to collada file
+//*****************************************************************************
   Assimp::Exporter exporter;
   std::string filename = "scene.dae";
   exporter.Export(&scene, "collada", filename);
