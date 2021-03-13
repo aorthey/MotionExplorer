@@ -38,7 +38,7 @@ materialRestriction.diffuse_color = (0.8, 0.4, 1.0, 1.0)
 materialRestriction.metallic = 0.9
 materialRestriction.specular_intensity = 0.9
 
-def drawScene(filename, scn, resolution, thick):
+def drawScene(filename):
     global cameraLocation
     dirname = os.path.dirname(os.path.realpath(__file__))
     sys.path.append(dirname)
@@ -93,21 +93,25 @@ def drawScene(filename, scn, resolution, thick):
     addCamera(cameraLocation, cameraFocusPoint)
 
     ### SAVE IMAGE
-    bpy.context.scene.render.film_transparent = True
-    bpy.context.scene.render.image_settings.color_mode = 'RGBA'
-    bpy.context.scene.render.filepath = dirname+"/"+filename+'.png'
+    renderEngine = bpy.context.scene.render
+    renderEngine.film_transparent = True
+    # renderEngine.ffmpeg.format = "PNG"
+    renderEngine.image_settings.file_format = "PNG"
+
+    renderEngine.image_settings.color_mode = 'RGBA'
+    renderEngine.filepath = dirname+"/"+filename+'.png'
     bpy.ops.render.render(write_still = True)
 
-    bpy.context.scene.render.filepath = dirname+"/"+filename+'.png'
+    renderEngine.filepath = dirname+"/"+filename+'.png'
 
-    ff = bpy.context.scene.render.filepath
+    ff = renderEngine.filepath
     os.system("convert -trim %s %s"%(ff,ff))
 
-    print(bpy.context.scene.render.filepath)
+    print(renderEngine.filepath)
 
 if __name__ == "__main__":
 
   filenames = [ "2020ICRA/02D_torus_SPARStwo", 
       "2020ICRA/02D_torus_PRMstar"]
   for filename in filenames:
-    drawScene(filename, bpy.context.scene, 72, mobiusStripThickness)
+    drawScene(filename)#, bpy.context.scene, 72, mobiusStripThickness)

@@ -123,7 +123,8 @@ void PathSpaceSparseOptimization::grow()
     {
         init();
         firstRun_ = false;
-        vGoal_ = addConfiguration(qGoal_);
+        addConfiguration(qGoal_);
+        addGoalConfiguration(qGoal_);
     }
     if (isDynamic())
     {

@@ -74,6 +74,7 @@ class PathPiecewiseLinear
 
     bool export_{false};
     void Export(const char *fn="", int id = 0);
+    void ExportKeyframe();
     void initExport();
 
     bool Load(const char *fn);

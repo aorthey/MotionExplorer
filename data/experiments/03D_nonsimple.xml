@@ -24,6 +24,8 @@
     <maxplanningtime>3</maxplanningtime>
     <pathSpeed>9</pathSpeed>
 
+    <algorithm name="multilevel:qrrt"/>
+
     <multilevel>
       <level robot_index="1" cspace_constant="1" type="R2"/>
       <level robot_index="0" cspace_constant="0.532623641291" type="SE2"/>

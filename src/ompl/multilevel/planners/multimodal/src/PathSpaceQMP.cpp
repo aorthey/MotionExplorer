@@ -37,7 +37,9 @@ void PathSpaceQMP::grow()
     if (firstRun_)
     {
         init();
-        vGoal_ = addConfiguration(qGoal_);
+        addConfiguration(qGoal_);
+        addGoalConfiguration(qGoal_);
+
         firstRun_ = false;
 
         // if (hasBaseSpace())
@@ -67,7 +69,7 @@ void PathSpaceQMP::grow()
 
     if (!hasSolution_)
     {
-        if (sameComponent(vStart_, vGoal_))
+        if (sameComponent(vStart_, getGoalIndex()))
         {
             hasSolution_ = true;
         }
@@ -76,14 +78,14 @@ void PathSpaceQMP::grow()
     Vertex v = xNew->index;
 
     // FALL 1: Pfad ist mit Start und Ziel verbunden
-    bool b = sameComponent(v, vStart_) && sameComponent(v, vGoal_);
+    bool b = sameComponent(v, vStart_) && sameComponent(v, getGoalIndex());
 
     if (b)
     {
         ompl::base::PathPtr pPath = getPath(vStart_, v);
         std::vector<Vertex> path = shortestVertexPath_;
 
-        ompl::base::PathPtr pPath2 = getPath(v, vGoal_);
+        ompl::base::PathPtr pPath2 = getPath(v, getGoalIndex());
         std::vector<Vertex> path2 = shortestVertexPath_;
 
         path.insert(path.end(), path2.begin() + 1, path2.end());
@@ -116,7 +118,7 @@ void PathSpaceQMP::grow()
         {
             bestCost_ = pathcost;
         }
-        // ompl::base::PathPtr pp = getPath(vStart_, vGoal_);
+        // ompl::base::PathPtr pp = getPath(vStart_, getGoalIndex());
         // std::cout << "Best cost found: " << bestCost_ << "; cost shortest path: " << pp->length() << std::endl;
 
         // OMPL_INFORM("Found %d path classes.", getNumberOfPaths());

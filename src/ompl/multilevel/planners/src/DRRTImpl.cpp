@@ -239,8 +239,8 @@ void DRRTImpl::grow()
         bool satisfied = differentiableGoal_->isSatisfied(xNext->state);
         if (satisfied)
         {
-            vGoal_ = addConfiguration(qGoal_);
-            addEdge(xNext->index, vGoal_);
+            addConfiguration(qGoal_);
+            addEdge(xNext->index, qGoal_->index);
             hasSolution_ = true;
         }else{
             std::cout << "Distance:" << differentiableGoal_->cost(xNext->state) << std::endl;

@@ -98,9 +98,37 @@ void PathPiecewiseLinear::initExport()
       xmlNode_ = CreateRootNodeInDocument(xmlDoc_);
       xmlNode_->SetValue("path");
       AddComment(*xmlNode_, "This file contains the evolution of a path over time. A path is represented by a sequence of states and a time index.");
+
+      ExportKeyframe();
   }
 }
 
+void PathPiecewiseLinear::ExportKeyframe()
+{
+    timePointEnd = ompl::time::now();
+    ompl::time::duration timeDuration = timePointEnd - timePointStart;
+    double duration = ompl::time::seconds(timeDuration);
+    int timeInt = int(duration*25.0);
+    std::string time = std::to_string(timeInt);
+    std::cout << "Adding at time: " << time << " duration: " << duration<< std::endl;
+    if(timeInt<0)
+    {
+      std::cout << "Time smaller zero: " << time << std::endl;
+      exit(0);
+    }
+
+    bool timeExist = (std::find(updateTimes_.begin(), updateTimes_.end(), timeInt) != updateTimes_.end());
+
+    if(timeExist) return;
+    updateTimes_.push_back(timeInt);
+
+    TiXmlElement* node = new TiXmlElement("keyframe");
+    Save(node);
+    node->SetAttribute("time", time);
+    node->SetValue("keyframe");
+    std::cout << "New keyframe added at time: " << time << std::endl;
+    xmlNode_->InsertEndChild(*node);
+}
 void PathPiecewiseLinear::Export(const char *fn, int id)
 {
   if(export_)
@@ -158,29 +186,7 @@ void PathPiecewiseLinear::setPath(ob::PathPtr path_input, bool force_set_path)
 
         if(export_)
         {
-            timePointEnd = ompl::time::now();
-            ompl::time::duration timeDuration = timePointEnd - timePointStart;
-            double duration = ompl::time::seconds(timeDuration);
-            int timeInt = int(duration*25.0);
-            std::string time = std::to_string(timeInt);
-            std::cout << "Adding at time: " << time << " duration: " << duration<< std::endl;
-            if(timeInt<0)
-            {
-              std::cout << "Time smaller zero: " << time << std::endl;
-              exit(0);
-            }
-
-            bool timeExist = (std::find(updateTimes_.begin(), updateTimes_.end(), timeInt) != updateTimes_.end());
-
-            if(timeExist) return;
-            updateTimes_.push_back(timeInt);
-
-            TiXmlElement* node = new TiXmlElement("keyframe");
-            Save(node);
-            node->SetAttribute("time", time);
-            node->SetValue("keyframe");
-            std::cout << "New keyframe added at time: " << time << std::endl;
-            xmlNode_->InsertEndChild(*node);
+          ExportKeyframe();
         }
     // }
 
