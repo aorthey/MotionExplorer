@@ -365,7 +365,7 @@ void PathSpaceSparseOptimization::getPlannerData(base::PlannerData &data) const
 
 void PathSpaceSparseOptimization::sampleFromDatastructure(base::State *xRandom_graph)
 {
-    if (!getTotalBundleSpace()->isDynamic() && pathStack_.size() > 0)
+    if (!getParent()->isDynamic() && pathStack_.size() > 0)
     {
         // if (selectedPath_ >= 0 && selectedPath_ < (int)pathStack_.size())
         // {
@@ -609,7 +609,7 @@ std::vector<ompl::base::State *> PathSpaceSparseOptimization::getProjectedPath(
     {
         const base::State *qk = pathBundle.at(k);
         base::State *qkProjected = getBase()->allocState();
-        projectBase(qk, qkProjected);
+        project(qk, qkProjected);
         pathBase.push_back(qkProjected);
     }
     return pathBase;
@@ -635,7 +635,7 @@ int PathSpaceSparseOptimization::getProjectionIndex(const std::vector<base::Stat
     // }
 
     PathSpaceSparseOptimization *parent = 
-      static_cast<PathSpaceSparseOptimization *>(getBaseBundleSpace());
+      static_cast<PathSpaceSparseOptimization *>(getChild());
     unsigned int K = parent->getNumberOfPaths();
 
     for (uint k = 0; k < K; k++)

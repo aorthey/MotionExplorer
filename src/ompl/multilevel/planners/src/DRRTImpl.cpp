@@ -4,7 +4,6 @@
 #include <ompl/base/goals/GoalStateDifferentiable.h>
 #include <ompl/geometric/PathGeometric.h>
 
-#include <ompl/multilevel/datastructures/pathrestriction/PathRestriction.h>
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <boost/foreach.hpp>

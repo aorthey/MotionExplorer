@@ -5,7 +5,6 @@
 #include <ompl/datastructures/PDF.h>
 #include <boost/math/constants/constants.hpp>
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
-#include <ompl/multilevel/datastructures/pathrestriction/PathRestriction.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 
@@ -38,7 +37,7 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
 
     if (hasBaseSpace())
     {
-        static_cast<BundleSpaceGraph *>(getBaseBundleSpace())->getGraphSampler()->disablePathBias();
+        static_cast<BundleSpaceGraph *>(getChild())->getGraphSampler()->disablePathBias();
     }
 }
 

@@ -6,7 +6,6 @@
 #include <boost/math/constants/constants.hpp>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
-#include <ompl/multilevel/datastructures/pathrestriction/PathRestriction.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 
@@ -23,7 +22,7 @@ PathSpaceQMP::PathSpaceQMP(const base::SpaceInformationPtr &si, BundleSpace *par
 
     if (hasBaseSpace())
     {
-        static_cast<BundleSpaceGraph *>(getBaseBundleSpace())->getGraphSampler()->disablePathBias();
+        static_cast<BundleSpaceGraph *>(getChild())->getGraphSampler()->disablePathBias();
     }
 }
 
