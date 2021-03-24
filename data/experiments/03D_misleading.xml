@@ -24,6 +24,9 @@
     <!-- <freeFloating>1</freeFloating> -->
     <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:smlr"/>
 
     <multilevel>
       <level robot_index="1" type="R2"/>

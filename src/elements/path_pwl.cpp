@@ -1229,6 +1229,13 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
       std::vector<double> state_k_serialized;
       space->copyToReals(state_k_serialized, states.at(k));
       AddSubNodeVector(*node, "state", state_k_serialized);
+      TiXmlElement* subnodeState = ReturnSubNodeVector(*node, "state", state_k_serialized);
+      if(quotient_space->isTimeDependent())
+      {
+          double time = quotient_space->GetTime(states.at(k));
+          subnodeState->SetAttribute("time", to_string(time));
+      }
+      node->InsertEndChild(*subnodeState);
     }
     //############################################################################
     uint N = quotient_space->GetControlDimensionality();
@@ -1270,7 +1277,13 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
         // space->copyToReals(state_k_serialized, states.at(k));
         Config qk = quotient_space->OMPLStateToConfig(states.at(k));
         std::vector<double> q_serialized = qk;
-        AddSubNodeVector(*node, "state", q_serialized);
+        TiXmlElement* subnodeState = ReturnSubNodeVector(*node, "state", q_serialized);
+        if(quotient_space->isTimeDependent())
+        {
+            double time = quotient_space->GetTime(states.at(k));
+            subnodeState->SetAttribute("time", to_string(time));
+        }
+        node->InsertEndChild(*subnodeState);
       }
     }
 

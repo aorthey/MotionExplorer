@@ -15,5 +15,8 @@ class CSpaceOMPLTime: public CSpaceOMPL
     virtual Vector3 getXYZ(const ob::State*) override;
 
     virtual uint GetKlamptDimensionality() const override;
+  // protected:
+  //   std::vector<int> idxsObjs_;
+  //   std::vector<ob::PathPtr> pathsObjs_;
 };
 

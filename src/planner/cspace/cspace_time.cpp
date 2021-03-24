@@ -11,9 +11,8 @@ CSpaceOMPLTime::CSpaceOMPLTime(RobotWorld *world_):
 
 void CSpaceOMPLTime::initSpace()
 {
-  //last dimension is TIME
   auto T = (std::make_shared<ob::TimeStateSpace>());
-  T->setBounds(0,1);
+  T->setBounds(0,2);
   this->space = T;
 }
 
@@ -49,8 +48,6 @@ double CSpaceOMPLTime::GetTime(const ob::State *qompl)
 
 void CSpaceOMPLTime::SetTime(ob::State *qompl, double time)
 {
-  SpaceInformationPtr()->printState(qompl);
-  std::cout << "TIME: " << time << std::endl;
   ob::TimeStateSpace::StateType *qOMPLTime = 
     qompl->as<ob::TimeStateSpace::StateType>();
   qOMPLTime->position = time;

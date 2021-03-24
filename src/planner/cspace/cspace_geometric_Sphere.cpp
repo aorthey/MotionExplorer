@@ -63,6 +63,8 @@ Config GeometricCSpaceOMPLSphere::OMPLStateToConfig(const ob::State *x)
     const double theta = S->getTheta();
     const double phi = S->getPhi();
 
+    // Eigen::Vector3f v = space->as<ob::SphereStateSpace>()->toVector(x);
+
     return AnglesToConfig(theta, phi);
 }
 

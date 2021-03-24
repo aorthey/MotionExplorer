@@ -16,13 +16,6 @@ GeometricCSpaceOMPLMobius::GeometricCSpaceOMPLMobius(RobotWorld *world_, int rob
 
 void GeometricCSpaceOMPLMobius::initSpace()
 {
-    // ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
-    // ob::StateSpacePtr R1(std::make_shared<ob::RealVectorStateSpace>(1));
-
-    // R1->as<ob::RealVectorStateSpace>()->setBounds(-intervalMax, +intervalMax);
-
-    // space = SO2 + R1;
-
     ob::StateSpacePtr M(std::make_shared<ob::MobiusStateSpace>(intervalMax));
 		space = M;
 }

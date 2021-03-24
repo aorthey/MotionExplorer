@@ -38,9 +38,6 @@
     <!--   path="../data/paths/disk_cylinder.tri_level0.path" -->
     <!-- /> -->
 
-    <algorithm name="multilevel:qmp"/>
-    <algorithm name="ompl:prm"/>
-
     <freeFloating>1</freeFloating>
     <maxplanningtime>0.5</maxplanningtime>
     <pathSpeed>10</pathSpeed>
@@ -49,12 +46,14 @@
 
     <multiAgent>1</multiAgent>
 
+    <algorithm name="multilevel:qrrt"/>
+
     <multilevel>
       <level>
         <robot id="0" freeFloating="1" type="SE2_DUBIN"/>
+        <time lb="0" ub="2"/>
         <!-- <robot id="1" freeFloating="1" type="SE2"/> -->
         <!-- <robot id="1" freeFloating="1" type="SE2"/> -->
-        <time/>
       </level>
     </multilevel>
 

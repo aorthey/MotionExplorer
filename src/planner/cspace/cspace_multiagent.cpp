@@ -22,10 +22,6 @@ CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
     {
       idxTimeSpace_ = k;
     }
-    if(ck->isTimeDependent())
-    {
-        timeDependentSpaceIdxs_.push_back(k);
-    }
     robot_ids.push_back(ck->GetRobotIndex());
   }
 
@@ -82,7 +78,7 @@ bool CSpaceOMPLMultiAgent::IsPlanar()
 
 bool CSpaceOMPLMultiAgent::isTimeDependent()
 {
-  if(timeDependentSpaceIdxs_.size()  >= 0) return true;
+  if(idxTimeSpace_ >= 0) return true;
   return false;
 }
 
@@ -110,7 +106,9 @@ bool CSpaceOMPLMultiAgent::isTimeDependent()
 bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
 {
   std::vector<Config> qks = splitConfig(q);
-  for(uint k = 0; k < cspaces_.size(); k++){
+
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     if(idxTimeSpace_ >= 0 && (int)k==idxTimeSpace_)
     {
       continue;
@@ -388,6 +386,18 @@ void CSpaceOMPLMultiAgent::SetTime(ob::State *qompl, double time)
   }
 }
 
+double CSpaceOMPLMultiAgent::GetTime(const ob::State *qompl)
+{
+  if(idxTimeSpace_ >= 0)
+  {
+      const ob::State *qomplAgent = 
+        static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(idxTimeSpace_);
+      return cspaces_.at(idxTimeSpace_)->GetTime(qomplAgent);
+  }else{
+      return -1;
+  }
+}
+
 Config CSpaceOMPLMultiAgent::OMPLStateToVelocity(const ob::State *qompl, int agent)
 {
   const ob::State *qomplAgent = static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(agent);
@@ -421,9 +431,8 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
   Config q; q.resize(GetKlamptDimensionality());
   int ctr = 0;
 
-
   double t = 0;
-  if(idxTimeSpace_ >= 0)
+  if(isTimeDependent())
   {
     CSpaceOMPLTime *ck = static_cast<CSpaceOMPLTime*>(cspaces_.at(idxTimeSpace_));
     const ob::State *stateTime = 
@@ -433,6 +442,8 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
 
   for(uint k = 0; k < cspaces_.size(); k++)
   {
+    if(idxTimeSpace_ >= 0 && (int)k==idxTimeSpace_) continue;
+
     Config qk;
     if(cspaces_.at(k)->isTimeDependent())
     {
