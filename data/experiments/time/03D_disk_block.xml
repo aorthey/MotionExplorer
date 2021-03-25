@@ -3,19 +3,21 @@
 
   <robot name="disk" file="../../robots/planar/disk_maze.urdf"/>
 
-  <rigidObject 
-    name="cylinder.tri" 
-    file="../../terrains/primitives/cylinder.tri"
-    path="paths/cylinder.xml"/>
+  <robot
+    name="moveable_cylinder" 
+    file="../../robots/primitives/cylinder_r_0_5_w_3_0.urdf"/>
+  <robot
+    name="moveable_cylinder" 
+    file="../../robots/primitives/cylinder_r_0_5_w_3_0.urdf"/>
 
   <plannerinput>
     <agent 
         id="0" 
-        qinit="6  -5 0 0 0 0 0 0"
-        qgoal="6  +5 0 0 0 0 0 1"
+        qinit="6  -5 0 0 0 0 0"
+        qgoal="6  +5 0 0 0 0 0"
     />
-    <se3min config="6  -5.0 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +5.0 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>
+    <se3min config="6  -5.0 -2.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5.0 +2.0 +0.5 +3.141593 +1.57 +3.141593"/>
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>0.5</maxplanningtime>
@@ -29,7 +31,9 @@
     <multilevel>
       <level>
         <robot id="0" freeFloating="1" type="R2"/>
-        <time lb="0" ub="2"/>
+        <time lb="0" ub="2"/> 
+        <robot id="1" controllable="0" path="../data/paths/time/cylinder.xml" type="R2"/>
+        <robot id="2" controllable="0" path="../data/paths/time/cylinder2.xml" type="R2"/>
       </level>
     </multilevel>
   </plannerinput>

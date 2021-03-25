@@ -23,6 +23,11 @@ CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
       idxTimeSpace_ = k;
     }
     robot_ids.push_back(ck->GetRobotIndex());
+    if(ck->isTimeDependent())
+    {
+      timeDependentSpaceIdxs_.push_back(k);
+    }
+
   }
 
   ob::StateSpacePtr empty(std::make_shared<ob::EmptyStateSpace>());
@@ -82,26 +87,18 @@ bool CSpaceOMPLMultiAgent::isTimeDependent()
   return false;
 }
 
-// bool CSpaceOMPLMultiAgent::UpdateRobotConfigTimeDependent(const ob::State *state)
-// {
-//     CSpaceOMPLTime *ck = static_cast<CSpaceOMPLTime*>(cspaces_.at(idxTimeSpace_));
-//     const ob::State *stateTime = 
-//       static_cast<const ob::CompoundState*>(state)->as<ob::State>(idxTimeSpace_);
+bool CSpaceOMPLMultiAgent::UpdateRobotConfigFromState(const ob::State *state)
+{
+  // if(isTimeDependent()) 
+  // {
+  //   CSpaceOMPLTime *ck = static_cast<CSpaceOMPLTime*>(cspaces_.at(idxTimeSpace_));
+  //   const ob::State *stateTime = 
+  //     static_cast<const ob::CompoundState*>(state)->as<ob::State>(idxTimeSpace_);
 
-//     double t = ck->GetTime(stateTime);
-
-//     for(uint k = 0; k < timeDependentSpaceIdxs_.size(); k++)
-//     {
-//       int idx = timeDependentSpaceIdxs_.at(k);
-//       CSpaceOMPL *ck = cspaces_.at(idx);
-//       Config q = ck->GetRobotConfigAtTime(t);
-
-//       Robot *robot = ck->GetRobotPtr();
-//       robot->UpdateConfig(q);
-//       robot->UpdateGeometry();
-//     }
-//     return true;
-// }
+  //   ck->UpdateEnvironmentFromState(stateTime);
+  // }
+  return BaseT::UpdateRobotConfigFromState(state);
+}
 
 bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
 {
@@ -139,6 +136,26 @@ std::vector<int> CSpaceOMPLMultiAgent::GetProjectionIdxs() const
   return ptr_to_next_level_robot_ids;
 }
 
+void CSpaceOMPLMultiAgent::drawConfigNonControllable(const Config &q, GLColor color)
+{
+  std::vector<Config> qks = splitConfig(q);
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    if(ck->GetRobotIndex()>=0){
+      ck->drawConfigNonControllable(qks.at(k), color);
+    }
+  }
+}
+void CSpaceOMPLMultiAgent::drawConfigControllable(const Config &q, GLColor color)
+{
+  std::vector<Config> qks = splitConfig(q);
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    if(ck->GetRobotIndex()>=0){
+      ck->drawConfigControllable(qks.at(k), color);
+    }
+  }
+}
 void CSpaceOMPLMultiAgent::drawConfig(const Config &q, GLColor color, double scale){
   std::vector<Config> qks = splitConfig(q);
   for(uint k = 0; k < cspaces_.size(); k++){
@@ -204,7 +221,7 @@ void CSpaceOMPLMultiAgent::initSpace()
     CSpaceOMPL *ck = cspaces_.at(k);
     ck->initSpace();
 
-    if(ck->isTimeDependent())
+    if(!ck->isControllable())
     {
       Nompls.push_back(0);
       static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(emptySpace_, 1);
@@ -359,20 +376,17 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
   std::vector<Config> qks = splitConfig(q);
 
-  int ctr = 0;
+  // int ctr = 0;
   for(uint k = 0; k < cspaces_.size(); k++)
   {
-    if((int)k!=idxTimeSpace_)
+    if((int)k==idxTimeSpace_)
     {
-        if(!cspaces_.at(k)->isTimeDependent())
-        {
-            ConfigToOMPLState(qks.at(k), qompl, ctr);
-            ctr += 1;
-        }
-    }else{
-        ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(ctr);
-        cspaces_.at(ctr)->SetTime(qomplAgent, 0);
-        ctr+=1;
+        ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(k);
+        cspaces_.at(k)->SetTime(qomplAgent, 0);
+    }else
+    {
+        if(!cspaces_.at(k)->isControllable()) continue;
+        ConfigToOMPLState(qks.at(k), qompl, k);
     }
   }
 }
@@ -432,6 +446,7 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
   int ctr = 0;
 
   double t = 0;
+
   if(isTimeDependent())
   {
     CSpaceOMPLTime *ck = static_cast<CSpaceOMPLTime*>(cspaces_.at(idxTimeSpace_));
@@ -442,19 +457,20 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
 
   for(uint k = 0; k < cspaces_.size(); k++)
   {
-    if(idxTimeSpace_ >= 0 && (int)k==idxTimeSpace_) continue;
+    // if(idxTimeSpace_ >= 0 && (int)k==idxTimeSpace_) continue;
+      if((int)k == idxTimeSpace_) continue;
 
-    Config qk;
-    if(cspaces_.at(k)->isTimeDependent())
-    {
-        qk = cspaces_.at(k)->GetRobotConfigAtTime(t);
-    }else{
-        qk = OMPLStateToConfig(qompl, k);
-    }
-    for(int j = 0; j < qk.size(); j++){
-      q[j+ctr] = qk[j];
-    }
-    ctr += qk.size();
+      Config qk;
+      if(!cspaces_.at(k)->isControllable())
+      {
+          qk = cspaces_.at(k)->GetRobotConfigAtTime(t);
+      }else{
+          qk = OMPLStateToConfig(qompl, k);
+      }
+      for(int j = 0; j < qk.size(); j++){
+        q[j+ctr] = qk[j];
+      }
+      ctr += qk.size();
   }
   return q;
 }

@@ -179,6 +179,7 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       ai.id = GetAttribute<int>(node_agent, "id");
       Config qzero;
       ai.isTimeDependent = GetAttributeDefault<int>(node_agent, "timedependent", 0);
+
       ai.timePathFile = GetAttributeDefault<std::string>(node_agent, "path", "");
 
       ai.q_init = GetAttribute<Config>(node_agent, "qinit");
@@ -330,6 +331,7 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
       layer.level = level++;
 
       layer.robot_index = GetAttribute<int>(lindex, "robot_index");
+      layer.isTimeDependent = GetAttributeDefault<int>(lindex, "timedependent", 0);
 
       layer.outer_index = 
         GetAttributeDefault<int>(lindex, "outer_index", layer.robot_index);
@@ -420,6 +422,26 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
       layer.level = lctr++;
 
+      TiXmlElement* time = FindFirstSubNode(lindex, "time");
+      if(time!=nullptr)
+      {
+        layer.isTimeDependent = true;
+        timeLB = GetAttribute<double>(time, "lb");
+        timeUB = GetAttribute<double>(time, "ub");
+
+        // TiXmlElement* externalrobot = FindFirstSubNode(time, "externalrobot");
+        // while(externalrobot!=nullptr)
+        // {
+        //   int id = GetAttribute<int>(externalrobot, "id");
+        //   externalRobotsIdxs.push_back(id);
+
+        //   std::string pathfile = GetAttribute<std::string>(externalrobot, "path");
+        //   externalRobotsPathFiles.push_back(pathfile);
+
+        //   externalrobot = FindNextSiblingNode(externalrobot);
+        // }
+      }
+
       TiXmlElement* ri = FindFirstSubNode(lindex, "robot");
       while(ri!=nullptr){
 
@@ -433,16 +455,12 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         layer.freeFloating.push_back(GetAttributeDefault<int>(ri, "freeFloating", 1));
 
         layer.controllable.push_back(GetAttributeDefault<int>(ri, "controllable", 1));
+        layer.path_filenames.push_back(GetAttributeDefault<std::string>(ri, "path", ""));
 
         int sid = GetAttributeDefault<int>(ri, "simplification_of_id", -1);
         layer.ptr_to_next_level_ids.push_back(sid);
 
         ri = FindNextSiblingNode(ri);
-      }
-      TiXmlElement* time = FindFirstSubNode(lindex, "time");
-      if(time!=nullptr)
-      {
-        layer.isTimeDependent = true;
       }
 
       layer.isMultiAgent = true;
@@ -559,6 +577,10 @@ const CSpaceInput& PlannerInput::GetCSpaceInput(int robot_idx)
   cin->timestep_max = timestep_max;
   cin->timestep_min = timestep_min;
   cin->fixedBase = !freeFloating;
+
+  cin->timeLB = timeLB;
+  cin->timeUB = timeUB;
+
   if(!ExistsAgentAtID(robot_idx))
   {
       cin->uMin = uMin;

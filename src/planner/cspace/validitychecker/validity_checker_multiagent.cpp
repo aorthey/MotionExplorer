@@ -19,8 +19,7 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 
   if(!cspace_->SatisfiesBounds(state)) return false;
 
-  Config q = cspace_->OMPLStateToConfig(state);
-  cspace_->UpdateRobotConfig(q);
+  cspace_->UpdateRobotConfigFromState(state);
 
   std::vector<int> ridxs = cspace_->GetRobotIdxs();
 
@@ -74,8 +73,8 @@ double OMPLValidityCheckerMultiAgent::clearance(const ob::State* state) const
 
 double OMPLValidityCheckerMultiAgent::DistanceToConstraints(const ob::State* state) const
 {
-  Config q = cspace_->OMPLStateToConfig(state);
-  cspace_->UpdateRobotConfig(q);
+  cspace_->UpdateRobotConfigFromState(state);
+
 
   std::vector<int> ridxs = cspace_->GetRobotIdxs();
 

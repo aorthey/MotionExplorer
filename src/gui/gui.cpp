@@ -115,7 +115,8 @@ void ForceFieldBackend::Start()
   click_mode = ModeNormal;
   pose_objects = 1;
 
-  if(world->robots.size()>0){
+  if(world->robots.size()>0)
+  {
     Robot *robot = world->robots[0];
     uint Nlinks  = robot->links.size();
     wrenchfield.init(Nlinks);
@@ -167,7 +168,7 @@ void ForceFieldBackend::RenderWorld()
 
   if(state("draw_robot")){
     for(size_t i=0;i<world->robots.size();i++) {
-      if(i!=active_robot) continue;
+      // if(i!=active_robot) continue;
       Robot *robot = &sim.odesim.robot(i)->robot;
       // Config q = robot->q;
       // robot->UpdateConfig(q);

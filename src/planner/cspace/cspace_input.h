@@ -1,6 +1,7 @@
 #pragma once
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include "planner/planner_input.h"
+#include "elements/path_pwl.h"
 
 struct CSpaceInput
 {
@@ -17,4 +18,8 @@ struct CSpaceInput
 
   bool isTimeDependent{false};
   std::string timePathFile;
+
+  double timeLB{0};
+  double timeUB{1};
+
 };

@@ -63,7 +63,8 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer)
   for(uint k = 0; k < layer.ids.size(); k++)
   {
     int rk = layer.ids.at(k);
-    if(rk >= (int)world->robots.size()){
+    if(rk >= (int)world->robots.size())
+    {
       OMPL_ERROR("Robot Index ID %d does not exists. (Check XML)", rk);
       throw "wrong ID";
     }
@@ -74,7 +75,8 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer)
     cspace_levels.push_back(cspace_level_k);
     if(!layer.controllable.at(k))
     {
-      std::cout << "Not controllable" << std::endl;
+      cspace_level_k->setControllable(false);
+      cspace_level_k->setPredefinedPath(layer.path_filenames.at(k));
     }
   }
   if(layer.isTimeDependent)
@@ -318,7 +320,7 @@ void MotionPlanner::CreateHierarchy()
           }
         }
         uint N = cspace_level_k->GetKlamptDimensionality();
-        if(qi.size() != (int)N)
+        if(qi.size() != (int)N && !cspace_level_k->isTimeDependent())
         {
           OMPL_ERROR("Init vector contains %d dimensions, but robot %d has %d dimensions", 
               qi.size(), cspace_level_k->GetRobotIndex(), N);
@@ -790,8 +792,9 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
 
   if(state("planner_draw_start_configuration"))
   {
-    qspace->drawConfig(qi, colorStartConfiguration);
-    cspace->drawConfig(qiOuter, colorStartConfigurationTransparent);
+    // cspace->drawConfigNonControllable(qi);
+    qspace->drawConfigControllable(qi, colorStartConfiguration);
+    cspace->drawConfigControllable(qiOuter, colorStartConfigurationTransparent);
     if(state("draw_distance_robot_terrain"))
     {
       auto checker = dynamic_cast<OMPLValidityChecker*>(
@@ -812,8 +815,8 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
       {
         Config qk = qgVec.at(k);
         Config qkOuter = qgOuterVec.at(k);
-        qspace->drawConfig(qk, colorGoalConfiguration);
-        cspace->drawConfig(qkOuter, colorGoalConfigurationTransparent);
+        qspace->drawConfigControllable(qk, colorGoalConfiguration);
+        cspace->drawConfigControllable(qkOuter, colorGoalConfigurationTransparent);
       }
     }else{
       if(config_goal_region_levels_subspace.size()>0)
@@ -827,14 +830,14 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
             std::pair<Config,Config> qi = qs.at(i);
             Config qL = qi.first;
             Config qU = qi.second;
-            qspace->drawConfig(qL, colorGoalConfiguration);
-            qspace->drawConfig(qU, colorGoalConfiguration);
+            qspace->drawConfigControllable(qL, colorGoalConfiguration);
+            qspace->drawConfigControllable(qU, colorGoalConfiguration);
           }
 
         }
       }else{
-        qspace->drawConfig(qg, colorGoalConfiguration);
-        cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
+        qspace->drawConfigControllable(qg, colorGoalConfiguration);
+        cspace->drawConfigControllable(qgOuter, colorGoalConfigurationTransparent);
       }
     }
   }

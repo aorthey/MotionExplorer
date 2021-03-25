@@ -31,9 +31,13 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     virtual bool SatisfiesBounds(const ob::State*) override;
     virtual bool UpdateRobotConfig(Config &q) override;
+    virtual bool UpdateRobotConfigFromState(const ob::State *state) override;
 
     void setNextLevelRobotPointers(std::vector<int>);
 
+    virtual void drawConfigNonControllable(const Config &q, 
+        GLDraw::GLColor color=GLDraw::getColorRobot()) override;
+    virtual void drawConfigControllable(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0)) override;
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0) override;
 
     virtual bool IsPlanar() override;
@@ -71,6 +75,8 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     std::vector<int> Nklampts;
     std::vector<int> Nompls;
+
+    std::vector<int> timeDependentSpaceIdxs_;
 
     int subspaceCount{0};
 

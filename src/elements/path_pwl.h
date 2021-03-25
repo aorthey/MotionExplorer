@@ -91,12 +91,14 @@ class PathPiecewiseLinear
     int id_;
   protected:
 
+    //for keyframe extraction to blender (visualize path deformations)
     TiXmlDocument xmlDoc_;
     TiXmlElement *xmlNode_;
     std::vector<int> updateTimes_;
 
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
+    std::vector<double> timing;
 
     bool isSmooth{false};
     Vector3 Vector3FromState(ob::State *s);

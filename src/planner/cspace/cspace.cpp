@@ -1,3 +1,4 @@
+#include "util.h"
 #include "gui/colors.h"
 #include "gui/drawMotionPlanner.h"
 #include "planner/cspace/cspace.h"
@@ -51,6 +52,12 @@ Config CSpaceOMPL::ControlToConfig(const double* control)
   OMPL_ERROR("NYI");
   throw "NYI";
   return q;
+}
+
+bool CSpaceOMPL::UpdateRobotConfigFromState(const ob::State *state)
+{
+    Config q = OMPLStateToConfig(state);
+    return UpdateRobotConfig(q);
 }
 
 bool CSpaceOMPL::UpdateRobotConfig(Config &q)
@@ -153,14 +160,6 @@ void CSpaceOMPL::Init()
   }
   this->initSpace();
 
-  if(isTimeDependent() && !isMultiAgent())
-  {
-      std::cout << *this << std::endl;
-      path_ = std::make_shared<PathPiecewiseLinear>(this);
-      path_->Load(input.timePathFile.c_str());
-      path_->Normalize();
-      std::cout << "Loading path from " << input.timePathFile << std::endl;
-  }
 }
 
 void CSpaceOMPL::setFixedTimePath(std::string file)
@@ -181,7 +180,8 @@ Config CSpaceOMPL::GetRobotConfigAtTime(double t)
       Config q; q.resize(robot->q.size());
       return q;
   }else{
-      return path_->Eval(t);
+      Config q= path_->Eval(t);
+      return q;
   }
 }
 
@@ -354,7 +354,7 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
 
 void CSpaceOMPL::DrawGL(GUIState& state)
 {
-  if(isTimeDependent())
+  if(!isControllable())
   {
     if(path_ != nullptr)
     {
@@ -369,7 +369,39 @@ void CSpaceOMPL::DrawGL(GUIState& state)
 
   return;
 }
+bool CSpaceOMPL::isControllable() const
+{
+  return controllable_;
+}
 
+void CSpaceOMPL::setControllable(bool controllable)
+{
+  controllable_ = controllable;
+}
+void CSpaceOMPL::setPredefinedPath(std::string path_filename)
+{
+    std::cout << *this << std::endl;
+    path_ = std::make_shared<PathPiecewiseLinear>(this);
+    std::cout << "Loading path from " << path_filename << std::endl;
+    path_->Load(path_filename.c_str());
+    std::cout << "Loading path from " << path_filename << std::endl;
+}
+
+void CSpaceOMPL::drawConfigNonControllable(const Config &q, GLDraw::GLColor color)
+{
+  if(!isControllable())
+  {
+    drawConfig(q, color);
+  }
+}
+
+void CSpaceOMPL::drawConfigControllable(const Config &q, GLDraw::GLColor color)
+{
+  if(isControllable())
+  {
+    drawConfig(q, color);
+  }
+}
 void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale)
 {
     GLDraw::drawRobotAtConfig(robot, q, color);

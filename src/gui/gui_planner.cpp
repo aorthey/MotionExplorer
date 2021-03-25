@@ -771,7 +771,7 @@ void PlannerBackend::ExportToCollada()
 
   for(size_t i=0;i<world->robots.size();i++) 
   {
-      if(i!=active_robot) continue;
+      // if(i!=active_robot) continue;
       Robot *robot = &sim.odesim.robot(i)->robot;
 
       for(size_t j=0;j<robot->links.size();j++) 

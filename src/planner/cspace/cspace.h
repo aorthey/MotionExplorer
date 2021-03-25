@@ -61,6 +61,7 @@ class CSpaceOMPL
 
     virtual bool SatisfiesBounds(const ob::State*);
     virtual bool UpdateRobotConfig(Config &q);
+    virtual bool UpdateRobotConfigFromState(const ob::State *state);
 
     virtual Config GetRobotConfigAtTime(double t);
 
@@ -83,6 +84,8 @@ class CSpaceOMPL
     ob::StateSpacePtr SpacePtrNonConst();
     const oc::ControlSpacePtr ControlSpacePtr();
 
+    virtual void drawConfigNonControllable(const Config &q, GLDraw::GLColor color=GLDraw::getColorRobot());
+    virtual void drawConfigControllable(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0));
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
     virtual void drawConfig(const Config &q, const Config &dq, GLDraw::GLColor color=GLDraw::GLColor(1,0,0));
     virtual void DrawGL(GUIState& state);
@@ -92,6 +95,10 @@ class CSpaceOMPL
     void OMPLSO3StateSpaceFromEulerZYX( double rz, double ry, double rx, ob::SO3StateSpace::StateType *q );
 
     std::recursive_mutex& getLock();
+
+    bool isControllable() const;
+    void setControllable(bool);
+    void setPredefinedPath(std::string);
 
     virtual bool isDynamic() const = 0;
     bool isFixedBase();
@@ -108,6 +115,7 @@ class CSpaceOMPL
     virtual Config ControlToConfig(const double*);
 
     bool drawDistanceRobotTerrain_{false};
+    bool controllable_{true};
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
     virtual void initSpace() = 0;

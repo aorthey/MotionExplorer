@@ -18,7 +18,10 @@ struct Layer{
   Config dq_init;
   Config dq_goal;
   std::string type;
+
   bool isTimeDependent{false};
+  double timeLB;
+  double timeUB;
 
   std::string path_fname;
 
@@ -35,6 +38,7 @@ struct Layer{
   std::vector<std::string> types;
   std::vector<int> freeFloating;
   std::vector<int> controllable;
+  std::vector<std::string> path_filenames;
 };
 
 struct ContactInformation
@@ -52,8 +56,8 @@ struct ContactInformation
   int triTo{-1};
 };
 
-
-struct AgentInformation{
+struct AgentInformation
+{
   Config q_init;
   Config q_goal;
   Config dq_init;
@@ -71,7 +75,8 @@ struct AgentInformation{
   std::string timePathFile;
 };
 
-struct Stratification{
+struct Stratification
+{
   std::vector<Layer> layers;
 };
 
@@ -120,6 +125,11 @@ class PlannerInput{
     double max_planning_time{0.0};
     double timestep_min{0.0};
     double timestep_max{0.0};
+
+    double timeLB;
+    double timeUB;
+    std::vector<std::string> externalRobotsPathFiles;
+    std::vector<int> externalRobotsIdxs;
 
     bool smoothPath{false};
     double pathSpeed{1};

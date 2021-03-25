@@ -4,6 +4,8 @@
 class CSpaceOMPLTime: public CSpaceOMPL
 {
   public:
+    typedef std::shared_ptr<PathPiecewiseLinear> PathPiecewiseLinearPtr;
+
     CSpaceOMPLTime(RobotWorld *world_);
     virtual bool isDynamic() const override;
     virtual void initSpace();
@@ -15,8 +17,11 @@ class CSpaceOMPLTime: public CSpaceOMPL
     virtual Vector3 getXYZ(const ob::State*) override;
 
     virtual uint GetKlamptDimensionality() const override;
-  // protected:
-  //   std::vector<int> idxsObjs_;
-  //   std::vector<ob::PathPtr> pathsObjs_;
+    // void UpdateEnvironmentFromState(const ob::State*);
+
+  protected:
+    //information about external dynamically moving robots
+    std::vector<int> externalRobotsIdxs;
+    std::vector<std::string> externalRobotsPathFiles;
 };
 

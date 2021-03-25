@@ -129,6 +129,7 @@ void PathPiecewiseLinear::ExportKeyframe()
     std::cout << "New keyframe added at time: " << time << std::endl;
     xmlNode_->InsertEndChild(*node);
 }
+
 void PathPiecewiseLinear::Export(const char *fn, int id)
 {
   if(export_)
@@ -361,6 +362,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const
 
 Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const
 {
+
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
   if(states.size() <= 0) 
@@ -1080,105 +1082,71 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
   if(!res) return false;
 
   length = GetSubNodeText<double>(node, "length");
+  bool timeDependent = GetAttributeDefault<int>(node, "timedependent", false);
 
+  // TiXmlElement* node_il = FindFirstSubNode(node, "interlength");
+  // while(node_il!=nullptr)
+  // {
+  //   double tmp;
+  //   GetStreamText(node_il) >> tmp;
+  //   interLength.push_back(tmp);
+  //   node_il = FindNextSiblingNode(node_il);
+  // }
+
+  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+  ob::StateSpacePtr space = si->getStateSpace();
+  space->setup();
   interLength.clear();
-
-  TiXmlElement* node_il = FindFirstSubNode(node, "interlength");
-  while(node_il!=nullptr)
   {
-    double tmp;
-    GetStreamText(node_il) >> tmp;
-    interLength.push_back(tmp);
-    node_il = FindNextSiblingNode(node_il);
-  }
-
-  if(quotient_space->isDynamic()){
-
-    //############################################################################
-    oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
-    oc::SpaceInformationPtr siC = 
-      dynamic_pointer_cast<oc::SpaceInformation>(cpath->getSpaceInformation());
-    ob::StateSpacePtr space = siC->getStateSpace();
-    // cpath->clear();
-
-    std::vector<ob::State*> states;
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    gpath.clear();
     TiXmlElement* node_state = FindFirstSubNode(node, "state");
+
+    ob::State *last = nullptr;
+    double oldTime = 0;
     while(node_state!=nullptr)
     {
       std::vector<double> tmp = GetNodeVector<double>(node_state);
-      ob::State *state = siC->allocState();
-      space->copyFromReals(state, tmp);
-      states.push_back(state);
+
+      Config q(tmp);
+      ob::State *state = si->allocState();
+      quotient_space->ConfigToOMPLState(q, state);
+
+      gpath.append(state);
+
+      if(last!=nullptr)
+      {
+        if(timeDependent)
+        {
+          double t = GetAttribute<double>(node_state, "time");
+          interLength.push_back(t-oldTime);
+          oldTime = t;
+        }else
+        {
+          interLength.push_back(si->distance(last, state));
+        }
+      }
+      last = state;
       node_state = FindNextSiblingNode(node_state);
     }
-
-    //############################################################################
-    uint N = quotient_space->GetControlDimensionality();
-    std::vector<oc::Control*> controls;
-    TiXmlElement* node_ctrl = FindFirstSubNode(node, "control");
-    while(node_ctrl!=nullptr)
+    std::cout << interLength << std::endl;
+    length = std::accumulate(interLength.begin(), interLength.end(), 0.0);
+    std::cout << length << std::endl;
+    path = std::make_shared<og::PathGeometric>(gpath);
+  }
+  {
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+    gpath.clear();
+    TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
+    while(node_state!=nullptr)
     {
-      std::vector<double> tmp = GetNodeVector<double>(node_ctrl);
-      oc::RealVectorControlSpace::ControlType *control = 
-        static_cast<oc::RealVectorControlSpace::ControlType*>(siC->allocControl());
-      for(uint j = 0; j < N; j++)
-      {
-        control->values[j] = tmp.at(j);
-      }
-      controls.push_back(control);
-      node_ctrl = FindNextSiblingNode(node_ctrl);
+      std::vector<double> tmp = GetNodeVector<double>(node_state);
+      ob::State *state = si->allocState();
+      space->copyFromReals(state, tmp);
+      gpath.append(state);
+      node_state = FindNextSiblingNode(node_state);
     }
-    //############################################################################
-    TiXmlElement* node_ctrl_duration = FindFirstSubNode(node, "controlDuration");
-    std::vector<double> controlDurations;
-    while(node_ctrl_duration!=nullptr)
-    {
-      std::stringstream ss = GetStreamText(node_ctrl_duration);
-      double _tmp;
-      ss >> _tmp;
-      controlDurations.push_back(_tmp);
-      node_ctrl_duration = FindNextSiblingNode(node_ctrl_duration);
-    }
-    //############################################################################
-    for(uint k = 0; k < controls.size(); k++)
-    {
-      cpath->append(states.at(k), controls.at(k), controlDurations.at(k));
-    }
-    cpath->append(states.back());
-    //############################################################################
-  }else{
-    ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-    ob::StateSpacePtr space = si->getStateSpace();
-    space->setup();
-    {
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-      gpath.clear();
-      TiXmlElement* node_state = FindFirstSubNode(node, "state");
-      while(node_state!=nullptr)
-      {
-        std::vector<double> tmp = GetNodeVector<double>(node_state);
-        ob::State *state = si->allocState();
-        space->copyFromReals(state, tmp);
-
-        gpath.append(state);
-        node_state = FindNextSiblingNode(node_state);
-      }
-      path = std::make_shared<og::PathGeometric>(gpath);
-    }
-    {
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
-      gpath.clear();
-      TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
-      while(node_state!=nullptr)
-      {
-        std::vector<double> tmp = GetNodeVector<double>(node_state);
-        ob::State *state = si->allocState();
-        space->copyFromReals(state, tmp);
-        gpath.append(state);
-        node_state = FindNextSiblingNode(node_state);
-      }
-      path_raw = std::make_shared<og::PathGeometric>(gpath);
-    }
+    path_raw = std::make_shared<og::PathGeometric>(gpath);
   }
   return true;
 }
