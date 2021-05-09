@@ -8,7 +8,6 @@ namespace ompl
     namespace multilevel
     {
         using DRRT = BundleSpaceSequence<DRRTImpl>;
-
     }
 }
 

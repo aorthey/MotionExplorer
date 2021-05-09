@@ -2,7 +2,6 @@
 #include <ompl/multilevel/datastructures/BundleSpace.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
-#include <ompl/multilevel/planners/multimodal/PathSpaceSparseOptimization.h>
 #include <ompl/multilevel/planners/multimodal/PathSpaceSparse.h>
 
 #include <ompl/base/goals/GoalSampleableRegion.h>
@@ -29,14 +28,8 @@ ompl::multilevel::MultiLevelPathSpace<T>::MultiLevelPathSpace(std::vector<base::
         Pk->setLocalMinimaTree(localMinimaTree_);
     }
 
-    PathSpaceSparseOptimization *Qk_tmp = 
-      dynamic_cast<PathSpaceSparseOptimization*>( this->bundleSpaces_.back());
-    if(Qk_tmp != nullptr)
-    {
-        needPreprocessing = true;
-    }
-
     setExtensionStrategy(ExtensionStrategy::MANUAL);
+    setExtensionStrategy(ExtensionStrategy::AUTOMATIC_DEPTH_FIRST);
 }
 
 template <class T>
@@ -85,6 +78,16 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
     //Choice of bundle space to grow depends on extensionstrategy
     BundleSpace *jBundle;
 
+    //NOTE:
+    //manual extension: take a specific minima and only expand in its path
+    //restriction
+    //
+    //automatic extension (depth first): For each level, pick the best-cost path
+    //and sample in its path restriction.
+    //
+    //automatic extension (breadth first): For each level, try to sample until
+    //convergence, then iterate through all minima by sampling their path
+    //restriction.
     if(extensionStrategy_ == ExtensionStrategy::MANUAL)
     {
         std::vector<int> selectedLocalMinimum = localMinimaTree_->getSelectedPathIndex();
@@ -109,6 +112,8 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
             }
         }
 
+        std::cout << "Growing on " << K << "-th space." << std::endl;
+
         // Check which
         jBundle = static_cast<BundleSpace *>(this->bundleSpaces_.at(K));
     }else if(extensionStrategy_ == ExtensionStrategy::AUTOMATIC_BREADTH_FIRST)
@@ -117,8 +122,51 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
         throw "NYI";
     }else if(extensionStrategy_ == ExtensionStrategy::AUTOMATIC_DEPTH_FIRST)
     {
-        OMPL_ERROR("Extension Strategy not yet implemented.");
-        throw "NYI";
+        //iterate through all levels which contain a minimum path and set the
+        //best-cost path as the selected minimum. Then select one level at random
+        //with a large bias towards the highest non-minimum path containing level. 
+        //Then exand the selected level: do random sampling with bias
+        //towards the principal path restriction. 
+
+        uint K = this->bundleSpaces_.size();
+
+        while (K > 0)
+        {
+            if (localMinimaTree_->getNumberOfMinima(K - 1) > 0)
+            {
+                break;
+            }
+            else
+            {
+                K = K - 1;
+            }
+        }
+
+        std::vector<int> principalPathIndices;
+
+        for(uint k = 0; k < K; k++)
+        {
+            std::vector<LocalMinimaNode *> paths = localMinimaTree_->getPaths(k);
+            double d_best = dInf;
+            int j_best = 0;
+            for(uint j = 0; j < paths.size(); j++)
+            {
+              LocalMinimaNode *pj = paths.at(j);
+              double dj = pj->getCost();
+              if(dj < dInf)
+              {
+                d_best = dj;
+                j_best = j;
+              }
+            }
+            principalPathIndices.push_back(j_best);
+        }
+
+        //setting best cost paths
+        // localMinimaTree_->setSelectedPathIndex(principalPathsIndices);
+
+        jBundle = static_cast<BundleSpace *>(this->bundleSpaces_.at(K));
+
     }else{
         OMPL_ERROR("Extension Strategy is unknown: %d", extensionStrategy_);
         throw "NYI";
@@ -131,7 +179,6 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
     while (!ptc())
     {
         jBundle->grow();
-        bool isInfeasible = jBundle->isInfeasible();
         if (jBundle->isInfeasible())
         {
             OMPL_DEBUG("Infeasibility detected (level %d).", jBundle->getLevel());
@@ -177,15 +224,6 @@ void MultiLevelPathSpace<T>::getPlannerData(base::PlannerData &data) const
     {
         BundleSpaceGraph *Qk = static_cast<BundleSpaceGraph *>(this->bundleSpaces_.at(k));
 
-        //TODO: remove once the new planner runs robustly (only needed for old
-        //explorer version where we do the path enumeration AFTER the planning
-        //step, not inbetween)
-        if(needPreprocessing)
-        {
-            PathSpaceSparseOptimization *Qk_tmp = 
-              static_cast<PathSpaceSparseOptimization*>(Qk);
-            Qk_tmp->enumerateAllPaths();
-        }
         Qk->getPlannerData(data);
 
         for (unsigned int vidx = Nvertices; vidx < data.numVertices(); vidx++)

@@ -14,9 +14,11 @@
 #include <ompl/multilevel/planners/qmp/QMP.h>
 #include <ompl/multilevel/planners/qmp/QMPStar.h>
 #include <ompl/multilevel/planners/sparse/SMLR.h>
+#include <ompl/multilevel/planners/sparse/MultiSPARS.h>
 
 //experimental
 #include <ompl/multilevel/planners/DRRT.h>
+#include <ompl/multilevel/planners/TENET.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -173,11 +175,12 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="multilevel:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
   else if(algorithm=="multilevel:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
   else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::SMLR>(siVec, "SMLR");
+  else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::MultiSPARS>(siVec, "MultiSPARS");
+  else if(algorithm=="multilevel:smlr_old") planner = std::make_shared<om::SMLR>(siVec, "SMLR");
   else if(algorithm=="multilevel:drrt") planner = std::make_shared<om::DRRT>(siVec, "DRRT");
+  else if(algorithm=="multilevel:tenet") planner = std::make_shared<om::TENET>(siVec, "TENET");
 
   else if(algorithm=="multilevel:minimaspanner") planner = std::make_shared<om::LocalMinimaSpanners>(siVec, "LocalMinimaSpanners");
-  else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "MotionExplorer");
   else if(algorithm=="sampler_infeasible")
   {
     planner = std::make_shared<og::InfeasibilitySampler>(si);

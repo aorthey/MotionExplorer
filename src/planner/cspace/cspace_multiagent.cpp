@@ -139,9 +139,11 @@ std::vector<int> CSpaceOMPLMultiAgent::GetProjectionIdxs() const
 void CSpaceOMPLMultiAgent::drawConfigNonControllable(const Config &q, GLColor color)
 {
   std::vector<Config> qks = splitConfig(q);
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     CSpaceOMPL *ck = cspaces_.at(k);
-    if(ck->GetRobotIndex()>=0){
+    if(ck->GetRobotIndex()>=0)
+    {
       ck->drawConfigNonControllable(qks.at(k), color);
     }
   }

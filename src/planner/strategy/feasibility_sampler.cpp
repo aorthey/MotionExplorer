@@ -21,6 +21,8 @@ ompl::base::PlannerStatus FeasibilitySampler::solve(const ompl::base::PlannerTer
     {
       ob::State *q = si_->cloneState(testState);
       states.push_back(q);
+      std::cout << "FEASIBLE STATE:" << std::endl;
+      si_->printState(testState);
     }
   }
   return ompl::base::PlannerStatus::EXACT_SOLUTION;

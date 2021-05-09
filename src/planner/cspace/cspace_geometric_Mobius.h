@@ -21,8 +21,8 @@ class GeometricCSpaceOMPLMobius: public GeometricCSpaceOMPL
     virtual double OMPLStateToSO2Value(const ob::State *qompl);
 
     Vector3 ProjectToVector3(double u, double v);
-    Config ProjectToConfig(double u, double v);
-  private:
+    virtual Config ProjectToConfig(double u, double v);
+
     double zOffset_{0.0};
     double radius_{1.0};
     double intervalMax{0.5};

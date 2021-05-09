@@ -57,7 +57,6 @@ namespace ompl
 
             ExtensionStrategy getExtensionStrategy();
 
-
         protected:
             double pathBias{0.8};  //[0,1]
 

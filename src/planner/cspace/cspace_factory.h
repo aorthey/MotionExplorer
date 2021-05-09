@@ -10,6 +10,7 @@
 #include "planner/cspace/cspace_kinodynamic_SO2.h"
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_Mobius.h"
+#include "planner/cspace/cspace_geometric_KleinBottle.h"
 #include "planner/cspace/cspace_geometric_SolidTorus.h"
 #include "planner/cspace/cspace_geometric_Torus.h"
 #include "planner/cspace/cspace_geometric_Sphere.h"
@@ -172,6 +173,13 @@ class CSpaceFactory{
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceMobius( RobotWorld *world, int robot_idx)
     {
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLMobius(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceKleinBottle( RobotWorld *world, int robot_idx)
+    {
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLKleinBottle(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;

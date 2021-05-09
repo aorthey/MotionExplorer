@@ -110,7 +110,7 @@ void PathPiecewiseLinear::ExportKeyframe()
     double duration = ompl::time::seconds(timeDuration);
     int timeInt = int(duration*25.0);
     std::string time = std::to_string(timeInt);
-    std::cout << "Adding at time: " << time << " duration: " << duration<< std::endl;
+    // std::cout << "Adding at time: " << time << " duration: " << duration<< std::endl;
     if(timeInt<0)
     {
       std::cout << "Time smaller zero: " << time << std::endl;
@@ -126,7 +126,7 @@ void PathPiecewiseLinear::ExportKeyframe()
     Save(node);
     node->SetAttribute("time", time);
     node->SetValue("keyframe");
-    std::cout << "New keyframe added at time: " << time << std::endl;
+    // std::cout << "New keyframe added at time: " << time << std::endl;
     xmlNode_->InsertEndChild(*node);
 }
 

@@ -1,7 +1,7 @@
 #include "planner/cspace/cspace_geometric_Sphere.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
-#include "ompl/base/spaces/SphereStateSpace.h"
+#include "ompl/base/spaces/special/SphereStateSpace.h"
 #include "common.h"
 #include "gui/colors.h"
 #include <KrisLibrary/GLdraw/drawextra.h>

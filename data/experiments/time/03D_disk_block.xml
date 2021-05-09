@@ -2,6 +2,7 @@
 <world>
 
   <robot name="disk" file="../../robots/planar/disk_maze.urdf"/>
+  <!-- <robot name="car" file="../../robots/planar/car.urdf"/> -->
 
   <robot
     name="moveable_cylinder" 
@@ -26,14 +27,16 @@
     <smoothPath>0</smoothPath>
     <multiAgent>1</multiAgent>
 
+    <algorithm name="multilevel:tenet"/>
     <algorithm name="multilevel:qrrt"/>
 
     <multilevel>
       <level>
+        <!-- <robot id="0" freeFloating="1" type="SE2_DUBIN"/> -->
         <robot id="0" freeFloating="1" type="R2"/>
         <time lb="0" ub="2"/> 
-        <robot id="1" controllable="0" path="../data/paths/time/cylinder.xml" type="R2"/>
-        <robot id="2" controllable="0" path="../data/paths/time/cylinder2.xml" type="R2"/>
+        <robot id="1" controllable="0" path="../data/experiments/time/paths/cylinder.xml" type="R2"/>
+        <robot id="2" controllable="0" path="../data/experiments/time/paths/cylinder2.xml" type="R2"/>
       </level>
     </multilevel>
   </plannerinput>

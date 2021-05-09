@@ -2,10 +2,10 @@
 
 <world>
 
-  <robot name="mug" file="../../objects/mug.urdf"
+  <robot name="mug" file="../../../objects/mug.urdf"
   config="6 -0.0903446 0.0843289 0 1.27075 0 0"/>
 
-  <robot name="schunk" file="../../robots/schunk/sdh.urdf"/>
+<robot name="schunk" file="../../../robots/schunk/sdh.urdf"/>
 
   <plannerinput>
 
@@ -22,8 +22,12 @@
       qinit="18  -0.130317 -0.0879818 0.0876798 2.9787 1.4743 2.35701 0 0 -1.1 1.5708 0 0 -1.2 1.5708 0 0.16 0.890796 0 "
     />
 
-    <se3min config="6  -12.0 -12.0 -40.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +12.0 +12.0 +20.0 +3.141593 +1.57 +3.141593"/>
+    <se3min config="6  -0.2 -0.1 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +0.3 +0.3 +0.2 +3.141593 +1.57 +3.141593"/>
+
+    <algorithm name="multilevel:smlr"/>
+    <algorithm name="ompl:spars2"/>
+    <algorithm name="ompl:spars"/>
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 

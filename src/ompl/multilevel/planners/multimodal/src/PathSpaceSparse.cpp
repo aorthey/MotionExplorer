@@ -32,7 +32,7 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
 
     setName("PathSpaceSparse" + std::to_string(id_));
 
-    sparseDeltaFraction_ = 0.1; //original is 0.25 (SMLR). We used 0.15 for WAFR
+    sparseDeltaFraction_ = 0.25; //original is 0.25 (SMLR). We used 0.15 for WAFR
     maxFailures_ = 1000;
 
     if (hasBaseSpace())
@@ -209,6 +209,9 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
         geometric::PathGeometric &gpath = 
           static_cast<geometric::PathGeometric &>(*path);
 
+        //TODO: encapsulate the functionality into "AddPathToDatabase", then use
+        //this for database sparsification.
+
         optimizePath(gpath);
 
         // std::cout << " OPTIMIZED to path with cost " << gpath.length() 
@@ -277,8 +280,11 @@ bool PathSpaceSparse::arePathsEquivalent(
         gpath1.getStates(), gpath2.getStates(), getBundle());
     return (d < 0.3); //TODO: Make this a bit more rigorous (how about relating it to epsilon?)
 }
+
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
+    //NOTE: You can insert your own optimizer at this point. 
+
     if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)
     {
         // std::cout << "SO2 detected. Optimizer disabled." << std::endl;

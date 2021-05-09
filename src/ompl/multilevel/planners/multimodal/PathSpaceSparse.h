@@ -45,9 +45,12 @@ namespace ompl
               addEdge(const Vertex a, const Vertex b) override;
 
             void checkPath(const Vertex v, const Vertex vStart, const Vertex vGoal);
+
             base::PathPtr constructPath(const Vertex v, const Vertex vStart, const Vertex vGoal);
+
             bool arePathsEquivalent( ompl::base::PathPtr path1, 
                 ompl::base::PathPtr path2);
+
         protected:
             double bestCost_{std::numeric_limits<double>::infinity()};
 

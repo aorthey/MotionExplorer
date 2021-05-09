@@ -1,7 +1,7 @@
 #include "planner/cspace/cspace_geometric_Mobius.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 // #include <ompl/base/spaces/SO2StateSpace.h>
-#include <ompl/base/spaces/MobiusStateSpace.h>
+#include <ompl/base/spaces/special/MobiusStateSpace.h>
 #include "common.h"
 #include "gui/colors.h"
 #include <KrisLibrary/GLdraw/drawextra.h>
