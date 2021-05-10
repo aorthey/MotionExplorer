@@ -1,0 +1,53 @@
+High-level argument to make: Our algorithm is not exact, but we can (a) solve
+realistic and useful problems and (b) we can scale up to many dimensions.
+
+Main application should be to prioritized multi-robot planning. Because this is
+what we need for fast multi-robot rearrangement planning.
+
+WHy is there no Sparse Bidirectional DDRRT ? Seems so obvious to do. Also Why
+not do multilevel sparse dynamic-domain asymtoptically optimal bidirectional
+RRT*?
+--> Always concentrate on solving a real awesome problem!
+
+TODO:
+[ ] Clarify all experiments
+[ ] Run benchmarks of ALL planner. Get table. 
+[ ] Run MultiSPARS (old) on them all.
+[ ] Run MultiSPARS (new) on them all.
+
+What experiments to do?
+
+(1) Toy experiment for pull figure: Torus?. maybe cylinder? needs to be
+multilevel for sure. Also it would not hurt to have something like klein bottle
+or mobius strip. Note that they should showcase three things: sparse roadmaps,
+multilevel abstractions AND infeasibility detection (AND OPTIONAL:) why fiber
+bundles are essential (and not only product spaces). Torus with circle plus
+stopper might be the way to go. Maybe a 3d space which projects onto a 2d space?
+SE2? ---> Do two-halves torus
+
+(2) Have 12 experiments (=24 having feasible/infeasible problem variations). All of them should highlight something essential.
+
+(1) Bugtrap: Narrow passage, SE3 object
+(2) Drone: Flying 
+(3) KUKA: Fixed-based manip
+(4) PR2: Mobile-base
+
+Missing:
+DONE (5) Multi-robot: Mobile base manips open crossing vs. closed crossing
+(6) Picking?
+(7) Picking?
+(8) Time: Car overtaking (Available probably in July)
+
+(9)
+(10)
+(11)
+(12)
+
+Other ideas
+- Multigoal regions
+- Time-dependency: Can we overtake a car?
+Feasibility study: Does it fit?
+
+Limit cases: 
+
+AND: further research on multimodal paths to improve algorithm. 

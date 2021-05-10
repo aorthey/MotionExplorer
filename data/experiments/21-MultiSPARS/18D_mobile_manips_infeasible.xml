@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+  <robot name="kuka_full1" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk1" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <terrain file="../../terrains/cross.tri" translation="-1 -1.5 0.05">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cuboid.tri" translation="1 0 0"/>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="13  0 +1 0 0 0 0 0 0 -0.7 0 0 0 0 "
+      qgoal="13  2 -1 0 0 0 0 0 0 0 0 0 0 0 "
+    />
+    <agent 
+      id="2" 
+      qinit="13  0 -1 0 0 0 0 0 0 -0.1 0 0 0 0 "
+      qgoal="13  2 +1 0 0 0 0 0 0 -0.5 0 -0.5 0 0 "
+    />
+
+    <se3min config="6  -1.5 -2.5 0 -3.141593 0 0"/>
+    <se3max config="6  +3.5 +2.5 0 +3.141593 0 0"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>3</pathSpeed>
+    <freeFloating>1</freeFloating>
+    <smoothPath>1</smoothPath>
+    <algorithm name="multilevel:smlr"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="ompl:spars2"/>
+    <algorithm name="ompl:spars"/>
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="R2"/>
+      </level>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE2RN"/>
+        <robot id="2" freeFloating="1" type="SE2RN"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>
