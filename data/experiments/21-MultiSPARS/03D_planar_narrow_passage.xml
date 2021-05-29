@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="disk" file="../../robots/planar/disk_0_20.urdf"/>
+
+  <rigidObject  name="O1" file="../../terrains/narrow_passage/narrow_passage_0_30.stl"/>
+
+  <plannerinput>
+
+    <se3min config="6  -6 -2.0 -0.1 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +6 +4.0 +0.1 +3.141593 +1.57 +3.141593"/>
+
+    <qinit config="6  -3.0 -1 0 0 0 0 "/>
+    <qgoal config="6  +4.0 -1 0 0 0 0 "/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>10</maxplanningtime>
+    <pathSpeed>12</pathSpeed>
+    <algorithm name="multilevel:smlr"/>
+    <multilevel>
+      <level robot_index="0" type="R2"/>
+    </multilevel>
+  </plannerinput>
+</world>

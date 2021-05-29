@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="cylinder" file="../../robots/planar/PlanarRectangle.urdf"/>
+  <robot name="disk" file="../../robots/planar/disk_0_36.urdf"/> <!-- radius -->
+
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-0.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-1.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-2.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-3.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-4.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-5.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/bugtrap2d-6.obj"/>
+
+  <plannerinput>
+
+    <qinit  config="6  -1 -1.6 0 1.57 0 0"/>
+    <qgoal  config="6  +6 0.6 0 -0.5 0 0"/>
+    <se3min config="6  -3.0 -4.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +7.0 +3.0 +0.0 +3.141593 +1.57 +3.141593"/>
+    <!-- <se3min config="6  -2.0 -0.5 -0.0 -3.141593 -1.57 -3.141593"/> -->
+    <!-- <se3max config="6  +2.0 +0.5 +0.0 +3.141593 +1.57 +3.141593"/> -->
+    <freeFloating>1</freeFloating>
+    <smoothPath>0</smoothPath>
+    <maxplanningtime>0.5</maxplanningtime>
+    <pathSpeed>12</pathSpeed>
+
+    <algorithm name="sampler_feasible"/>
+    <algorithm name="multilevel:drrt"/>
+    <algorithm name="ompl:rrtconnect"/>
+
+    <multilevel>
+      <!-- <level robot_index="1" type="R2"/> -->
+      <level robot_index="0" type="SE2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="hedgehog" file="../../objects/puzzles/hedgehog/hedgehog.urdf"/>
+  <!-- <terrain name="cage" file="../../objects/assemblies/bayonet/0.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/bayonet/1.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/bayonet/2.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/bayonet/3.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/bayonet/4.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/bayonet/5.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/box/0.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/box/1.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/box/2.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/box/3.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/box/obstacle.obj"/> -->
+
+  <terrain name="cage" file="../../objects/assemblies/engine/collsionFree/0.obj"/>
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/1.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/2.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/3.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/4.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/5.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/6.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/7.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/8.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/9.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/10.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/11.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/12.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/13.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/14.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/15.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/16.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/17.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/18.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/19.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/20.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/21.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/22.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/23.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/24.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/25.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/26.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/27.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/28.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/29.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/30.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/31.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/32.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/33.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/34.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/35.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/36.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/37.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/38.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/39.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/40.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/41.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/42.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/43.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/44.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/45.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/46.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/47.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/48.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/49.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/50.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/51.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/52.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/53.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/54.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/55.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/56.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/57.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/58.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/59.obj"/> -->
+  <!-- <terrain name="cage" file="../../objects/assemblies/engine/collsionFreeCentered/60.obj"/> -->
+</world>
+

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="Lshape" file="../../robots/Lshape/PlanarLshape.urdf"/>
+  <robot name="sphere_inner" file="../../robots/Lshape/PlanarLshape_cylinder_inner.urdf"/>
+  <robot name="sphere_outer" file="../../robots/Lshape/PlanarLshape_cylinder_outer.urdf"/>
+
+  <!-- <rigidObject name="rectangle.tri" file="../../terrains/primitives/rectangle.tri" translation="5.2 -1.2 0" rotateRPY="0 0 1.57"/> -->
+  <!-- <rigidObject name="rectangle.tri" file="../../terrains/primitives/rectangle.tri" translation="5.2 1.2 0" rotateRPY="0 0 1.57"/> -->
+  <!-- <rigidObject name="rectangle.tri" file="../../terrains/primitives/rectangle.tri" translation="-4.7 -0.2 0" rotateRPY="0 0 0"/> -->
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 +2.3 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 -2.3 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="8  -3.0 0 0 -1.47 +0 +0.0 +0.0 0.0"/>
+    <qgoal  config="8  +2.5 0 0 -1.8 +0 +0.0 +0.0 0.0"/>
+
+    <se3min config="6  -2.0 -0.001 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2.0 +0.001 +0.0 +3.141593 +1.57 +3.141593"/>
+
+    <algorithm name="sampler_feasible"/>
+
+    <freeFloating>1</freeFloating>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>10</pathSpeed>
+    <!-- <algorithm name="ompl:rrt"/> -->
+
+    <multilevel>
+      <!-- <level robot_index="1" outer_index="2" type="R2"/> -->
+      <!-- <level robot_index="1" outer_index="2" type="R2"/> -->
+      <!-- <level robot_index="0" type="SE2"/> -->
+      <level robot_index="0" type="SE2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+
+
+

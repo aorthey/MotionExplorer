@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="disk" file="../robots/planar/car_capsule_inner.urdf"/>
+
+  <!-- <terrain name="cylinderBottom" scale="10 10 10" file="../../../brickr/bgate.obj"> -->
+  <terrain name="cylinderBottom" scale="10 10 10" file="../../../brickr/bgate2.obj">
+    <display color="0.8 0.8 0.8 1"/>
+  </terrain>
+
+</world>
+
+

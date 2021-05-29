@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- Test Case, where algorithm would go first into the deadend direction and
+  needs to figure out that (a) we cannot make progress there and (b) we need to
+  change direction to follow the second principal direction -->
+
+  <robot name="disk" file="../../robots/planar/disk_0_80.urdf"/>
+
+  <!-- <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_0_70.stl"/> -->
+  <!-- <terrain name="O1" file="../../../../3D-models/2d/room_spiral.stl"/> -->
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-0.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-1.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-2.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-3.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-4.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-5.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-6.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-7.obj"/>
+  <terrain name="O1" file="../../terrains/puzzles/room_spiral-8.obj"/>
+
+  <plannerinput>
+
+    <qinit  config="6  -6.0 +1.0 +0.0 +0.0 +0 +0.0"/>
+    <qgoal  config="6  +6.0 +1.0 +0.0 -0.0 +0 +0.0"/>
+    <se3min config="6  -7.0 -12.0 -1.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +7.0 +2.0 +1.0 +3.141593 +1.57 +3.141593"/>
+
+
+    <!--For visualization SAMPLER-->
+    <!-- <se3min config="6  -1.5 -1.0 -0.0 -3.141593 -1.57 -3.141593"/> -->
+    <!-- <se3max config="6  +1.5 +1.0 +0.0 +3.141593 +1.57 +3.141593"/> -->
+    <algorithm name="sampler_feasible"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
+    <!-- <freeFloating>1</freeFloating> -->
+    <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
+
+    <algorithm name="multilevel:drrt"/>
+    <algorithm name="ompl:rrt"/>
+
+    <multilevel>
+      <!-- <level robot_index="1" type="R2"/> -->
+      <level robot_index="0" type="R2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

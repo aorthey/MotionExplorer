@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<path_piecewise_linear timedependent="1">
+    <length>2</length>
+    <number_of_milestones>3</number_of_milestones>
+    <!--Smoothed States: Sequence of Configurations in Configuration Space-->
+    <state time="0">6  0 -4 0 0 0 0 </state>
+    <state time="0.8">6  0 -1.5 0 0 0 0 </state>
+    <state time="1">6  0 -1.5 0 0 0 0 </state>
+</path_piecewise_linear>

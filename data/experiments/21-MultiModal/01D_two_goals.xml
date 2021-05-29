@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- Test Case 1: 
+       Planner for revolute joint should converge quickly (<1s) to exactly two local minima, 
+       both with cost length 3.14 -->
+
+  <robot file="../../robots/disks/disk.urdf" translation="0 0 0.05"/>
+
+  <plannerinput>
+
+    <qinit  config="6  0 0 0 0 0 0"/>
+    <qgoal>
+      <state config="6  +2.5 0 0 0 0 0"/>
+      <state config="6  -2 0 0 0 0 0"/>
+    </qgoal>
+    <!-- <qgoal  config="6  +2 0 0 0 0 0"/> -->
+
+    <se3min config="6  -3 0 0 0 0 0"/>
+    <se3max config="6  +3 0 0 0 0 0"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>5</pathSpeed>
+    <pathWidth>0.05</pathWidth>
+    <!-- <threading>1</threading> -->
+
+    <algorithm name="multilevel:minimaspanner"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qrrtstar"/>
+    <algorithm name="multilevel:smlr"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrtstar"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:spars"/>
+    <algorithm name="ompl:spars2"/>
+
+    <!--goal region with multiple states and/or workspace targets -->
+
+    <freeFloating>1</freeFloating>
+    <multilevel>
+      <level robot_index="0" type="R2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+

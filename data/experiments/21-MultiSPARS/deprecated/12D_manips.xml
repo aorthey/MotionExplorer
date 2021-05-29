@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="kuka_lwr" file="../../robots/kuka_lwr/kuka_5links.urdf"/>
+  <robot name="kuka_lwr_2links" file="../../robots/kuka_lwr/kuka_2links.urdf"/>
+
+  <robot name="kuka_lwr" file="../../robots/kuka_lwr/kuka.urdf"/>
+  <robot name="kuka_lwr_2links" file="../../robots/kuka_lwr/kuka_2links.urdf"/>
+
+  <terrain name="cuboid" file="../../terrains/primitives/cuboid_1meter.tri" translation="1 0 0" rotateRPY="1.57 0 -1.57">
+     <display color="0.8 0.8 0.8"/>
+  </terrain>
+
+  <plannerinput>
+    <agent 
+      id="0" 
+      qinit="12  0 0 0 0 0 0 -2.52706 1.5707 1.54 -0.74 -1.48 1.6544 "
+      qgoal="12  0 0 0 0 0 0 +1.16706 1.5707 1.88706 1.6944 -1.48 1.6544"
+    />
+    <agent 
+      id="2" 
+      qinit="13  1 0 0 -0 0 0 0 0 0 0 0 0 0"
+      qgoal="13  1 0 0 -0 0 0 +1.16706 1.5707 1.88706 1.6944 -1.48 1.6544 0"
+    />
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.3</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>3</pathSpeed>
+    <smoothPath>1</smoothPath>
+    <!-- <algorithm name="multilevel:explorer"/> -->
+    <algorithm name="multilevel:smlr"/>
+    <!-- <algorithm name="multilevel:qrrt"/> -->
+    <!-- <algorithm name="ompl:rrt"/> -->
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="1" freeFloating="0" simplification_of_id="0" type="R3"/>
+        <robot id="3" freeFloating="0" simplification_of_id="2" type="R3"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="0" type="R6"/>
+        <robot id="2" freeFloating="0" type="R6"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>
+
