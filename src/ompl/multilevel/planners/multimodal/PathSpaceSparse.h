@@ -19,8 +19,6 @@ namespace ompl
     }
     namespace multilevel
     {
-        OMPL_CLASS_FORWARD(PathVisibilityChecker);
-
         class PathSpaceSparse : 
           public ompl::multilevel::PathSpace, 
           public ompl::multilevel::SMLRImpl
@@ -51,12 +49,16 @@ namespace ompl
             bool arePathsEquivalent( ompl::base::PathPtr path1, 
                 ompl::base::PathPtr path2);
 
+            unsigned int getRandomNonConvergedPathIndex();
+
         protected:
             double bestCost_{std::numeric_limits<double>::infinity()};
 
-            PathVisibilityChecker *pathVisibilityChecker_{nullptr};
+            double epsilonPathEquivalence_{0.0};
 
             void optimizePath(geometric::PathGeometric&);
+
+            double getPathCost(const geometric::PathGeometric&);
 
             const Vertex 
             getNearestGoalVertex(const std::pair<BundleSpaceGraph::Edge, bool> &edge);

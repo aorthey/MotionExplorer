@@ -116,6 +116,20 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
   std::cout << "Run " << pid << "/" << all_runs << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
+
+
+  auto pathSpacePlanner = 
+    dynamic_pointer_cast<ompl::multilevel::LocalMinimaSpanners>(planner);
+
+  if(pathSpacePlanner != nullptr)
+  {
+      auto localMinimaTree = pathSpacePlanner->getLocalMinimaTree();
+      std::string strm = "local minima tree modes found INTEGER";
+      run[strm] = to_string(localMinimaTree->getNumberOfMinima());
+      std::cout << "Minima found: " << localMinimaTree->getNumberOfMinima() << std::endl;
+  }
+
+
   pid++;
 
 }

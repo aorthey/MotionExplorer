@@ -30,6 +30,13 @@
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
+  <benchmark name="rss2021">
+    <algorithm name="multilevel:minimaspanner"/>
+    <maxplanningtime>120</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
+  </benchmark>
+
   <!-- complete benchmark of all planners -->
   <benchmark name="all_geometric">
 

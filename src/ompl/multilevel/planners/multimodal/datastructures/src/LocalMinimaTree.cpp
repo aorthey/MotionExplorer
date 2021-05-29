@@ -1,8 +1,9 @@
 #include "util.h"
 #include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathSpaceMetrics.h>
 #include <ompl/util/Console.h>
-#include <thread>
 #include <ompl/geometric/PathSimplifier.h>
+#include <thread>
 
 using namespace ompl::multilevel;
 
@@ -70,7 +71,7 @@ void LocalMinimaTree::setSelectedPathIndex(std::vector<int> selectedMinimum)
     selectedMinimum_ = selectedMinimum;
 }
 
-std::recursive_mutex &LocalMinimaTree::getLock()
+std::recursive_mutex& LocalMinimaTree::getLock()
 {
     return lock_;
 }
@@ -116,7 +117,7 @@ bool LocalMinimaTree::isConverged() const
 
 bool LocalMinimaNode::isConverged() const
 {
-    return (numberOfIdempotentUpdates_ > 2);
+    return (numberOfIdempotentUpdates_ > 10);
 }
 
 LocalMinimaNode *LocalMinimaTree::updatePath(
@@ -133,7 +134,8 @@ LocalMinimaNode *LocalMinimaTree::updatePath(
     double costOld = node->getCost();
     node->setCost(cost);
 
-    if(cost < costOld)
+    double error = fabs(cost - costOld);
+    if(error > 1e-2)
     {
         node->numberOfIdempotentUpdates_ = 0;
     }else
@@ -232,7 +234,6 @@ std::vector<LocalMinimaNode *> LocalMinimaTree::getSelectedPathSiblings() const
 
     int indexSelectedPath = selectedMinimum_.back();
 
-    // std::cout << level << " has " << getNumberOfMinima(level) << " paths." << std::endl;
     for (uint k = 0; k < getNumberOfMinima(level); k++)
     {
         if ((int)k == indexSelectedPath)
@@ -271,13 +272,36 @@ void LocalMinimaTree::printSelectedMinimum()
     {
         int level = selectedMinimum_.size() - 1;
         int maxMinima = getNumberOfMinima(selectedMinimum_.size() - 1);
+        int curMinimum = selectedMinimum_.back();
         OMPL_DEVMSG1("Selected local minimum %d/%d (level %d, cost %.2f%s)", 
           selectedMinimum_.back() + 1, 
           maxMinima, 
           level,
-          tree_.at(level).at(selectedMinimum_.back())->getCost(),
-          (tree_.at(level).at(selectedMinimum_.back())->isConverged()?
+          tree_.at(level).at(curMinimum)->getCost(),
+          (tree_.at(level).at(curMinimum)->isConverged()?
            ", [converged]":""));
+        ompl::msg::LogLevel logLevel = ompl::msg::getLogLevel();
+        if(logLevel <= ompl::msg::LOG_DEV2)
+        {
+          for(int k = 0; k < maxMinima; k++)
+          {
+            if(k != curMinimum)
+            {
+              LocalMinimaNode *nk = tree_.at(level).at(k);
+              LocalMinimaNode *ncur = tree_.at(level).at(curMinimum);
+              const std::vector<base::State*> &sk = nk->asStates();
+              const std::vector<base::State*> &scur = ncur->asStates();
+              double dist = pathMetric_MaxMin(sk, scur, siVec_.at(level));
+
+              OMPL_DEVMSG2(" -- Distance to path %d/%d (cost %.2f%s): %.2f", 
+                k+1,
+                maxMinima, 
+                nk->getCost(),
+                (nk->isConverged()?"[c]":""),
+                dist);
+            }
+          }
+        }
     }
 }
 
@@ -358,16 +382,6 @@ void LocalMinimaTree::setSelectedMinimumExpandFull()
     }
     hasChanged_ = true;
 }
-
-// void LocalMinimaTree::printSelectedMinimum()
-// {
-//     for (uint k = 0; k < selectedMinimum_.size(); k++)
-//     {
-//         std::cout << selectedMinimum_.at(k);
-//         std::cout << (k < selectedMinimum_.size() - 1 ? " > " : "");
-//     }
-//     std::cout << std::endl;
-// }
 
 const std::vector<ompl::base::State *>&
 LocalMinimaTree::getSelectedMinimumAsStateVector(int level) const

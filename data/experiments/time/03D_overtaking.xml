@@ -47,6 +47,7 @@
     <multiAgent>1</multiAgent>
 
     <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:smlr"/>
 
     <multilevel>
       <level>

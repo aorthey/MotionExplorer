@@ -4,6 +4,7 @@
 #include "planner/cspace/cspace_time.h"
 #include "planner/cspace/validitychecker/validity_checker_multiagent.h"
 #include "planner/cspace/integrator/multiagent.h"
+#include "planner/cspace/cspace_multiagent_time_motionvalidator.h"
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/control/ControlSpace.h>
 #include <ompl/base/spaces/EmptyStateSpace.h>
@@ -190,7 +191,12 @@ ob::SpaceInformationPtr CSpaceOMPLMultiAgent::SpaceInformationPtr(){
     return si;
 
   }else{
-    return BaseT::SpaceInformationPtr();
+    si = BaseT::SpaceInformationPtr();
+    if(isTimeDependent())
+    {
+      si->setMotionValidator(std::make_shared<ob::TimeMotionValidator>(si, this));
+    }
+    return si;
   }
 }
 

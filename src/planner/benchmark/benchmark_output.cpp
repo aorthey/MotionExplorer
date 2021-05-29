@@ -146,6 +146,12 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
 
       AddSubNode(runnode, "memory", run["memory REAL"]);
 
+      std::string ssstrm = "local minima tree modes found INTEGER";
+      if(run.find(ssstrm) != run.end())
+      {
+          AddSubNode(runnode, "number_of_modes", run[ssstrm]);
+      }
+
       //extract status
       int status = stoi(run["status ENUM"]);
       if(time >= experiment.maxTime)

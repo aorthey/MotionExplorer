@@ -28,6 +28,10 @@
   <terrain file="../../terrains/primitives/plane.tri" translation="0 0 -0.05" scale="0.6 0.6 1">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
+  <terrain file="../../terrains/primitives/cuboid_1meter.tri" 
+    translation="0.0 -0.3 -0.05" rotateRPY="0 0 -0.35" scale="13 0.25 0.5">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
   <terrain file="../../terrains/primitives/cube.tri" translation="0.3 0 -0.05">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
@@ -85,6 +89,9 @@
     <algorithm name="multilevel:smlr"/>
 
     <multilevel>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="R2"/>
+      </level>
       <level>
         <robot id="1" freeFloating="1" simplification_of_id="1" type="R2"/>
         <robot id="5" freeFloating="1" simplification_of_id="5" type="R2"/>

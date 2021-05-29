@@ -1,3 +1,22 @@
+Examples of infeasibility detection which would be useful
+-overtaking (planning in spacetime)
+-caging (too difficult?)
+
+CAGING: Maybe think about alternative necessary conditions!?
+One idea: use varava idea of covering SO3. 
+
+
++Torus
++Dubin's Car
+
+2 more missing
+
+[ ] Torus Infeasible/Feasible
+[ ] Visualize in Blender as Front-page figure
+[ ] Dubin's car example (something more intricate than just narrow passage?)
+[ ] Add box/origami example, e.g. opening up a solar panel or something? (Why
+not preprogramming one motion?)
+
 High-level argument to make: Our algorithm is not exact, but we can (a) solve
 realistic and useful problems and (b) we can scale up to many dimensions.
 

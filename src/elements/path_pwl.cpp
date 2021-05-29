@@ -94,7 +94,6 @@ void PathPiecewiseLinear::initExport()
   if(export_)
   {
       // timePointStart = ompl::time::now();
-      std::cout << "Init Export" << std::endl;
       xmlNode_ = CreateRootNodeInDocument(xmlDoc_);
       xmlNode_->SetValue("path");
       AddComment(*xmlNode_, "This file contains the evolution of a path over time. A path is represented by a sequence of states and a time index.");
@@ -378,7 +377,7 @@ Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const dou
 
   double Tcum = 0;
 
-  assert(interLength.size()==states.size()-1);
+  assert(interLength.size() == (states.size()-1));
 
   for(uint i = 0; i < interLength.size(); i++)
   {
@@ -979,6 +978,18 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
   {
     return;
   }
+
+  if(interLength.size() != (states.size()-1))
+  {
+    //recompute interlength
+    setPath(_path);
+    if(interLength.size() != (states.size()-1))
+    {
+      std::cout << "INTERLENGTH STILL WRONG" << std::endl;
+      exit(0);
+    }
+  }
+
 
   ob::StateSpacePtr space = si->getStateSpace();
 

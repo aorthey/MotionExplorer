@@ -6,7 +6,6 @@
 #include <boost/math/constants/constants.hpp>
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
-#include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 
 #include <ompl/util/Exception.h>
 #include <ompl/geometric/PathSimplifier.h>
@@ -28,12 +27,30 @@ using namespace ompl::multilevel;
 PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpace *parent_)
   : PathSpace(this), BaseT(si, parent_)
 {
-    pathVisibilityChecker_ = new PathVisibilityChecker(getBundle());
-
     setName("PathSpaceSparse" + std::to_string(id_));
 
-    sparseDeltaFraction_ = 0.25; //original is 0.25 (SMLR). We used 0.15 for WAFR
+    //NOTES on parameters:
+    //*sparsedeltafraction_:
+    //  * On 2D scenarios, 0.1 seems appropriate, because otherwise the graph
+    //  is too sparse and narrow passages might not be found reliably. Original
+    //  values were 0.25 (Dobson and Bekris, 2014) and 0.15 (Orthey and
+    //  Toussaint, WAFR, 2020).
+    //
+    //* maxfailures_:
+    //  * seems relatively robust, original value is 5000 (Dobson and Bekris,
+    //  2014). But a value of 1000 gives an estimated probability of free space sampled of
+    //  1 - 1/1000 = 0.999, which is already good enough for most scenarios.
+    //
+    //* epsilonpathequivalence_:
+    //  * this parameter is actually optimizer dependent. Here, we need to set
+    //  it relatively high, because the OMPL optimizer we use often gets stuck
+    //  near to a local minima mode. However, this should be elevated once we
+    //  switch to more powerful optimizers.
+
+
+    sparseDeltaFraction_ = 0.1; //original is 0.25 (SMLR). We used 0.15 for WAFR
     maxFailures_ = 1000;
+    epsilonPathEquivalence_ = 0.3;
 
     if (hasBaseSpace())
     {
@@ -43,7 +60,6 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
 
 PathSpaceSparse::~PathSpaceSparse()
 {
-    delete pathVisibilityChecker_;
 }
 
 bool PathSpaceSparse::hasConverged()
@@ -77,10 +93,14 @@ void PathSpaceSparse::grow()
     std::lock_guard<std::recursive_mutex> 
       guard(getLocalMinimaTree()->getLock());
 
-    if(getNumberOfPaths()<=0) return;
+    if(getNumberOfPaths()<=0)
+    {
+      return;
+    }
 
-    unsigned int index = rng_.uniformInt(0, getNumberOfPaths()-1);
-    if(isPathConverged(index)) return;
+    if(allPathsHaveConverged()) return;
+
+    unsigned int index = getRandomNonConvergedPathIndex();
 
     ompl::base::PathPtr& path = getPathPtrNonConst(index);
     geometric::PathGeometric &gpath = 
@@ -88,14 +108,14 @@ void PathSpaceSparse::grow()
 
     optimizePath(gpath);
 
-    double cost = gpath.length(); //TODO: make it arbitrary cost
+    double cost = getPathCost(gpath);
 
     updatePath(index, path, cost);
 
     for (unsigned int i = 0; i < getNumberOfPaths(); i++)
     {
         if(i == index) continue;
-        if(!isPathConverged(i)) continue;
+        // if(!isPathConverged(i)) continue;
         bool equal = arePathsEquivalent(path, getPathPtr(i));
         if(equal)
         {
@@ -103,6 +123,33 @@ void PathSpaceSparse::grow()
             break;
         }
     }
+}
+
+unsigned int PathSpaceSparse::getRandomNonConvergedPathIndex()
+{
+    std::vector<unsigned int> pIndices;
+    for(unsigned int k = 0; k < getNumberOfPaths(); k++)
+    {
+       if(isPathConverged(k)) continue;
+       pIndices.push_back(k);
+    }
+
+    if(pIndices.size() <= 0)
+    {
+      throw "AllPathsConverged";
+    }
+
+    int s = rng_.uniformInt(0, pIndices.size()-1);
+    unsigned int index = pIndices.at(s);
+    return index;
+}
+
+double PathSpaceSparse::getPathCost(const geometric::PathGeometric& path)
+{
+    ompl::base::OptimizationObjectivePtr obj = getOptimizationObjectivePtr();
+    double cost = path.cost(obj).value();
+    // double length = path.length();
+    return cost;
 }
 
 ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
@@ -212,16 +259,15 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
         //TODO: encapsulate the functionality into "AddPathToDatabase", then use
         //this for database sparsification.
 
-        optimizePath(gpath);
+        // gpath.interpolate();
 
-        // std::cout << " OPTIMIZED to path with cost " << gpath.length() 
-        //   << " (" << states.size() << " states)." << std::endl;
+        optimizePath(gpath);
+        double pathcost = getPathCost(gpath);
 
         bool isVisible = false;
 
-        double pathcost = gpath.length();
 
-        OMPL_INFORM("** Testing path with length %f",gpath.length());
+        OMPL_INFORM("** Testing path with cost %f", pathcost);
         for (uint i = 0; i < getNumberOfPaths(); i++)
         {
             //NOTE: 
@@ -234,7 +280,7 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
 
             if (isVisible)
             {
-                if (pathcost < getPathCost(i))
+                if (pathcost < PathSpace::getPathCost(i))
                 {
                     OMPL_INFORM("Update minima %d with path.", i);
                     updatePath(i, path, pathcost);
@@ -264,47 +310,67 @@ bool PathSpaceSparse::arePathsEquivalent(
     ompl::base::PathPtr path1,
     ompl::base::PathPtr path2)
 {
-    // std::cout << "Metric cost difference: " << d << std::endl;
     geometric::PathGeometric &gpath1 = 
       static_cast<geometric::PathGeometric &>(*path1);
     geometric::PathGeometric &gpath2 = 
       static_cast<geometric::PathGeometric &>(*path2);
-    double d1 = gpath1.length();
-    double d2 = gpath2.length();
-    double dabs = fabs(d1 - d2);
 
-    //Epsilon Equivalent cost 
-    if(dabs > 1e-1) return false;
+    //Early termination if length is too large
+    // double d1 = gpath1.length();
+    // double d2 = gpath2.length();
+    // double dabs = fabs(d1 - d2);
+    // if(dabs > 1e-1) return false;
 
     double d = pathMetric_MaxMin(
         gpath1.getStates(), gpath2.getStates(), getBundle());
-    return (d < 0.3); //TODO: Make this a bit more rigorous (how about relating it to epsilon?)
+    return (d < epsilonPathEquivalence_); 
 }
 
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
-    //NOTE: You can insert your own optimizer at this point. 
+    //NOTES
+    // * You can insert your own optimizer at this point. 
+    // * The algorithm should be agnostic to the implementation, but we assume
+    // that it asymptotically converges, always lowers the cost and is
+    // deterministic.
+
+    geometric::PathGeometric pathOld(gpath);
+    double costOld = getPathCost(pathOld);
+
+    bool valid = true;
 
     if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)
     {
-        // std::cout << "SO2 detected. Optimizer disabled." << std::endl;
         // optimizer_->collapseCloseVertices(gpath);
     }else{
-        // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
+        gpath.subdivide();
+        optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
         // optimizer_->smoothBSpline(gpath);
-        optimizer_->simplifyMax(gpath);
+        // optimizer_->perturbPath(gpath, 0.1);
+        valid = optimizer_->simplifyMax(gpath);
+
         // optimizer_->reduceVertices(gpath);
         // optimizer_->collapseCloseVertices(gpath);
     }
-
     gpath.interpolate();
+
+    double costNew = getPathCost(gpath);
+    // if(costNew > (costOld))
+    // {
+    //     valid = false;
+    // }
+
+    if(!valid)
+    {
+        gpath = pathOld;
+        OMPL_ERROR("RESTORED PATH (cost %.2f -> %.2f -> %.2f)", costOld, costNew, getPathCost(gpath));
+    }
+
     return;
 
     base::ProblemDefinitionPtr pdef = getProblemDefinition();
     base::OptimizationObjectivePtr obj = getOptimizationObjectivePtr();
     // const double rangeRatio = 0.01;
-
-    // double dmax = gpath.length();
 
     if (gpath.getStateCount() < 3)
         return;

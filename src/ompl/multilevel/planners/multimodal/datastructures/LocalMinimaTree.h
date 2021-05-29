@@ -175,8 +175,7 @@ namespace ompl
             LocalMinimaNode *updatePath(base::PathPtr path, double cost, int level, int index);
             void removePath(int level, int index);
 
-            std::recursive_mutex &getLock();
-            std::mutex &getNonRecursiveLock();
+            std::recursive_mutex& getLock();
 
             bool hasChanged();
 

@@ -15,6 +15,7 @@ class PlannerResults:
   run_feasible_nodes_per_level = []
   run_time = []
   run_status = [] #outcome: #solved, #infeasible, #aborted
+  run_number_of_modes = []
 
   def __del__(self):
     del self.run_time
@@ -40,6 +41,7 @@ class PlannerResults:
     self.run_nodes_per_level = np.zeros((self.runcount, self.levels),dtype=np.int)
     self.run_feasible_nodes_per_level = np.zeros((self.runcount, self.levels),dtype=np.int)
     self.run_time = np.zeros(self.runcount)
+    self.run_number_of_modes = np.zeros(self.runcount)
     self.run_status = np.zeros((3,1))
 
     self.AddRuns(xml)
@@ -71,6 +73,10 @@ class PlannerResults:
   def GetStatusCounter(self):
     return self.run_status
 
+  def AverageModes(self):
+    t =  np.mean(self.run_number_of_modes)
+    return t
+
   def AverageTime(self):
     t =  np.mean(self.run_time)
     return t
@@ -85,6 +91,8 @@ class PlannerResults:
         for rchild in child:
           if rchild.tag == "time":
             self.run_time[run_ctr] = float(rchild.text)
+          if rchild.tag == "number_of_modes":
+            self.run_number_of_modes[run_ctr] = float(rchild.text)
           if rchild.tag == "status":
             status = str(rchild.text)
             if status == "infeasible":

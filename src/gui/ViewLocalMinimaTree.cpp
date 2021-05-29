@@ -73,6 +73,7 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
 }
 void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode* node)
 {
+
   if(node == nullptr) return;
 
   if(node->customRepresentation == nullptr)
@@ -98,7 +99,6 @@ void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode*
   pathUnselected->drawSweptVolume = false;
   pathUnselected->drawCross = false;
   pathUnselected->DrawGL(state);
-
 }
 
 void ViewLocalMinimaTree::Save(const char* fn)
@@ -124,6 +124,10 @@ void ViewLocalMinimaTree::Save(const char* fn)
 
 void ViewLocalMinimaTree::DrawGL(GUIState& state)
 {
+  // std::cout << "LOCK DRAWGL" << std::endl;
+  // std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
+  // std::cout << "LOCKED DRAWGL" << std::endl;
+
   LocalMinimaNode* node = localMinimaTree_->getSelectedPath();
 
   if(node == nullptr) return;
@@ -232,7 +236,6 @@ void ViewLocalMinimaTree::DrawGLScreen(double x, double y)
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
-
 }
 
 void ViewLocalMinimaTree::DrawNode( double x, double y, double radius, int number)

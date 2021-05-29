@@ -42,8 +42,6 @@ void TENETImpl::grow()
     //(1) Get Random Sample
     sampleBundleGoalBias(xRandom_->state);
 
-		getBundle()->printState(xRandom_->state);
-
     //(2) Get Nearest in Tree
     const Configuration *xNearest = nearest(xRandom_);
 

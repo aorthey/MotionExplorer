@@ -27,6 +27,7 @@
     <smoothPath>0</smoothPath>
     <multiAgent>1</multiAgent>
 
+    <algorithm name="multilevel:smlr"/>
     <algorithm name="multilevel:tenet"/>
     <algorithm name="multilevel:qrrt"/>
 

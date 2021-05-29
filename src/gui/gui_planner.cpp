@@ -587,7 +587,8 @@ void PlannerBackend::RenderScreen(){
 
   }
 
-  if(planners.size()>0){
+  if(planners.size()>0)
+  {
     //display time
     if(state("draw_planner_time"))
     {

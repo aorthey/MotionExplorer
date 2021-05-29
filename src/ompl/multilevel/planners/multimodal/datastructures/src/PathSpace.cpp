@@ -1,6 +1,5 @@
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
-#include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 #include <ompl/base/Path.h>
 #include <boost/foreach.hpp>
 

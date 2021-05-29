@@ -772,7 +772,11 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
 
   if(state("planner_draw_start_configuration"))
   {
-    // cspace->drawConfigNonControllable(qi);
+    // if(!state("draw_play_path"))
+    // {
+    //   cspace->drawConfigNonControllable(qi);
+    // }
+
     qspace->drawConfigControllable(qi, colorStartConfiguration);
     cspace->drawConfigControllable(qiOuter, colorStartConfigurationTransparent);
     if(state("draw_distance_robot_terrain"))
