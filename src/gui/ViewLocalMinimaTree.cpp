@@ -1,6 +1,8 @@
 #include "ViewLocalMinimaTree.h"
 #include "elements/path_pwl.h"
 #include <ompl/base/State.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaNode.h>
 using namespace Math3D;
 using namespace ompl::multilevel;
 using namespace ompl::base;

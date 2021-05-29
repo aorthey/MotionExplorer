@@ -1,18 +1,20 @@
 #include <ompl/multilevel/planners/multimodal/PathSpaceSparse.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpaceMetrics.h>
-#include <ompl/tools/config/SelfConfig.h>
-#include <ompl/datastructures/NearestNeighbors.h>
-#include <ompl/datastructures/PDF.h>
-#include <boost/math/constants/constants.hpp>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 
-#include <ompl/util/Exception.h>
-#include <ompl/geometric/PathSimplifier.h>
+#include <ompl/base/Path.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 
+#include <ompl/geometric/PathSimplifier.h>
+#include <ompl/tools/config/SelfConfig.h>
+#include <ompl/datastructures/NearestNeighbors.h>
+#include <ompl/util/Exception.h>
+
+#include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -30,27 +32,48 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
     setName("PathSpaceSparse" + std::to_string(id_));
 
     //NOTES on parameters:
+    //# Sparse Roadmap Parameters
     //*sparsedeltafraction_:
     //  * On 2D scenarios, 0.1 seems appropriate, because otherwise the graph
     //  is too sparse and narrow passages might not be found reliably. Original
     //  values were 0.25 (Dobson and Bekris, 2014) and 0.15 (Orthey and
     //  Toussaint, WAFR, 2020).
-    //
     //* maxfailures_:
     //  * seems relatively robust, original value is 5000 (Dobson and Bekris,
     //  2014). But a value of 1000 gives an estimated probability of free space sampled of
     //  1 - 1/1000 = 0.999, which is already good enough for most scenarios.
     //
+    //# Optimizer Parameters
     //* epsilonpathequivalence_:
-    //  * this parameter is actually optimizer dependent. Here, we need to set
+    //  * this parameter details when the distance between paths is small enough
+    //  to consider them to be equivalent. Here, we need to set
     //  it relatively high, because the OMPL optimizer we use often gets stuck
     //  near to a local minima mode. However, this should be elevated once we
     //  switch to more powerful optimizers.
+    //* epsilonconvergencethreshold_:
+    //  * specifies the amount of change between optimizer iterations to
+    //  consider the optimizer to have converged. This parameter needs to be
+    //  combined with the Nsubtresholditerations_ parameter because we often
+    //  have optimizer iterations which changes cost minimally, but which still
+    //  have not yet converged.
+    //* Nsubtresholditerations_:
+    //  * Specifies after how many iterations, during which we fulfilled the
+    //  epsilonconvergencethreshold_, we will declare a path to have been
+    //  converged to its fixed path/attractor.
 
-
+    //sparse roadmap parameters
     sparseDeltaFraction_ = 0.1; //original is 0.25 (SMLR). We used 0.15 for WAFR
-    maxFailures_ = 1000;
+    maxFailures_ = 5000;
     epsilonPathEquivalence_ = 0.3;
+    epsilonConvergenceThreshold_ = 1e-2;
+    NsubtresholdIterations_ = 10;
+
+    // Working for all, except the Kleinbottle
+    // sparseDeltaFraction_ = 0.1;
+    // maxFailures_ = 5000;
+    // epsilonPathEquivalence_ = 0.3;
+    // epsilonConvergenceThreshold_ = 1e-2;
+    // NsubtresholdIterations_ = 10;
 
     if (hasBaseSpace())
     {

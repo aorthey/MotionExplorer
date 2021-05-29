@@ -1,4 +1,6 @@
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaNode.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/base/Path.h>
 #include <boost/foreach.hpp>
@@ -14,7 +16,10 @@ PathSpace::PathSpace(BundleSpaceGraph *bundleSpaceGraph) : bundleSpaceGraph_(bun
 void PathSpace::setLocalMinimaTree(LocalMinimaTreePtr localMinimaTree)
 {
     localMinimaTree_ = localMinimaTree;
+    localMinimaTree_->setEpsilonConvergenceThreshold(epsilonConvergenceThreshold_);
+    localMinimaTree_->setNsubtresholdIterations(NsubtresholdIterations_);
 }
+
 LocalMinimaTreePtr PathSpace::getLocalMinimaTree()
 {
     return localMinimaTree_;
@@ -28,7 +33,7 @@ void PathSpace::clear()
 {
 }
 
-ompl::base::PathPtr PathSpace::VerticesToPathPtr(VertexPath vpath)
+ompl::base::PathPtr PathSpace::VerticesToPathPtr(std::vector<BundleSpaceGraph::Vertex> vpath)
 {
     const BundleSpaceGraph::Graph &graph = bundleSpaceGraph_->getGraph();
 
@@ -59,7 +64,7 @@ void PathSpace::updatePath(unsigned int k, base::PathPtr path, double cost)
 }
 
 
-void PathSpace::updatePath(unsigned int k, VertexPath vpath, double cost)
+void PathSpace::updatePath(unsigned int k, std::vector<BundleSpaceGraph::Vertex> vpath, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();
     LocalMinimaNode *node = 
@@ -80,7 +85,7 @@ void PathSpace::addPath(geometric::PathGeometric& gpath, double cost)
     OMPL_INFORM("New path with cost %.2f (%d path(s) on level %d).", cost, getNumberOfPaths(), level);
 }
 
-void PathSpace::addPath(VertexPath vpath, double cost)
+void PathSpace::addPath(std::vector<BundleSpaceGraph::Vertex> vpath, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();
     LocalMinimaNode *node = localMinimaTree_->addPath(VerticesToPathPtr(vpath), cost, level);

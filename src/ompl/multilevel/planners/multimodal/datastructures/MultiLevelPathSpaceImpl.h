@@ -2,6 +2,7 @@
 #include <ompl/multilevel/datastructures/BundleSpace.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaNode.h>
 #include <ompl/multilevel/planners/multimodal/PathSpaceSparse.h>
 
 #include <ompl/base/goals/GoalSampleableRegion.h>

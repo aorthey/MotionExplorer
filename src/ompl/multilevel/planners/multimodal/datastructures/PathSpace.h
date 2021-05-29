@@ -1,6 +1,5 @@
 #pragma once
 #include <ompl/multilevel/datastructures/BundleSpaceGraph.h>
-#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/geometric/PathGeometric.h>
 
@@ -27,15 +26,15 @@ namespace ompl
 
             virtual unsigned int getNumberOfPaths() const;
 
-            base::PathPtr VerticesToPathPtr(VertexPath vpath);
+            base::PathPtr VerticesToPathPtr(std::vector<BundleSpaceGraph::Vertex>);
 
-            void updatePath(unsigned int k, VertexPath p, double cost);
+            void updatePath(unsigned int k, std::vector<BundleSpaceGraph::Vertex> p, double cost);
 
             void updatePath(unsigned int k, base::PathPtr path, double cost);
 
             void removePath(unsigned int k);
 
-            void addPath(VertexPath p, double cost);
+            void addPath(std::vector<BundleSpaceGraph::Vertex> p, double cost);
 
             void addPath(base::PathPtr path, double cost);
 
@@ -66,6 +65,10 @@ namespace ompl
             BundleSpaceGraph *bundleSpaceGraph_;
 
             LocalMinimaTreePtr localMinimaTree_;
+
+            double epsilonConvergenceThreshold_{1e-2};
+
+            int NsubtresholdIterations_{10};
         };
     }
 }

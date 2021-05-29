@@ -18,7 +18,7 @@
     <maxplanningtime>120</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.1</pathWidth>
-    <!-- <threading>1</threading> -->
+    <threading>1</threading>
 
     <algorithm name="multilevel:minimaspanner"/>
 

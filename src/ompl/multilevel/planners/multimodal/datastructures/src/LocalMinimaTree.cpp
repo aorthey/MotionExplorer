@@ -1,13 +1,12 @@
 #include "util.h"
 #include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaNode.h>
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpaceMetrics.h>
 #include <ompl/util/Console.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <thread>
 
 using namespace ompl::multilevel;
-
-int LocalMinimaNode::id_counter = 0;
 
 LocalMinimaTree::LocalMinimaTree(std::vector<base::SpaceInformationPtr> siVec) : siVec_(siVec)
 {
@@ -115,11 +114,6 @@ bool LocalMinimaTree::isConverged() const
     return true;
 }
 
-bool LocalMinimaNode::isConverged() const
-{
-    return (numberOfIdempotentUpdates_ > 10);
-}
-
 LocalMinimaNode *LocalMinimaTree::updatePath(
     base::PathPtr path, double cost, int level, int index)
 {
@@ -135,7 +129,7 @@ LocalMinimaNode *LocalMinimaTree::updatePath(
     node->setCost(cost);
 
     double error = fabs(cost - costOld);
-    if(error > 1e-2)
+    if(error > epsilonConvergenceThreshold_)
     {
         node->numberOfIdempotentUpdates_ = 0;
     }else
@@ -170,6 +164,7 @@ LocalMinimaNode *LocalMinimaTree::addPath(
     LocalMinimaNode *node = new LocalMinimaNode(siVec_.at(level), path);
     node->setLevel(level);
     node->setCost(cost);
+    node->setNsubtresholdIterations(NsubtresholdIterations_);
     // node->update();
 
     tree_.at(level).push_back(node);
@@ -179,6 +174,16 @@ LocalMinimaNode *LocalMinimaTree::addPath(
     setSelectedMinimumExpand();
     selectedMinimum_.back() = tree_.at(level).size() - 1;
     return node;
+}
+
+void LocalMinimaTree::setEpsilonConvergenceThreshold(double epsilon)
+{
+    epsilonConvergenceThreshold_ = epsilon;
+}
+
+void LocalMinimaTree::setNsubtresholdIterations(int N)
+{
+    NsubtresholdIterations_ = N;
 }
 
 void LocalMinimaTree::removePath(int level, int index)
@@ -390,160 +395,3 @@ LocalMinimaTree::getSelectedMinimumAsStateVector(int level) const
     LocalMinimaNode *node = tree_.at(level).at(selectedMinimumOnLevel);
     return node->asStates();
 }
-const ompl::base::PathPtr &LocalMinimaNode::asPathPtr() const
-{
-    if (hasPathPtrRepresentation)
-        return path_;
-
-    OMPL_ERROR("NYI");
-    throw ompl::Exception("NYI");
-}
-
-ompl::base::PathPtr &LocalMinimaNode::asPathPtrNonConst()
-{
-    if (hasPathPtrRepresentation)
-        return path_;
-
-    OMPL_ERROR("NYI");
-    throw ompl::Exception("NYI");
-}
-
-const StatesPath &LocalMinimaNode::asStates() const
-{
-    if (hasStatesRepresentation)
-        return spath_;
-
-    OMPL_ERROR("NYI");
-    throw ompl::Exception("NYI");
-}
-
-StatesPath &LocalMinimaNode::asStatesNonConst() 
-{
-    if (hasStatesRepresentation)
-        return spath_;
-
-    OMPL_ERROR("NYI");
-    throw ompl::Exception("NYI");
-}
-
-const VertexPath &LocalMinimaNode::asVertices() const
-{
-    if (hasVertexRepresentation)
-        return vpath_;
-    OMPL_ERROR("NYI");
-    throw ompl::Exception("NYI");
-}
-
-LocalMinimaNode::LocalMinimaNode(base::SpaceInformationPtr si, StatesPath &states)
-{
-    si_ = si;
-    spath_ = states;
-    hasStatesRepresentation = true;
-    init();
-}
-LocalMinimaNode::LocalMinimaNode(base::SpaceInformationPtr si, VertexPath &vertices)
-{
-    si_ = si;
-    vpath_ = vertices;
-    hasVertexRepresentation = true;
-    init();
-}
-LocalMinimaNode::LocalMinimaNode(base::SpaceInformationPtr si, base::PathPtr path)
-{
-    si_ = si;
-    path_ = path;
-    geometric::PathGeometricPtr gpath = 
-      std::dynamic_pointer_cast<geometric::PathGeometric>(path);
-    if (gpath != nullptr)
-    {
-      spath_ = gpath->getStates();
-      hasStatesRepresentation = true;
-    }
-    hasPathPtrRepresentation = true;
-    init();
-}
-
-void LocalMinimaNode::init()
-{
-    id_ = id_counter++;
-    // export_ = true;
-    // timePointStart = ompl::time::now();
-
-    // if(export_)
-    // {
-    //     xmlNode_ = CreateRootNodeInDocument(xmlDoc_);
-    //     xmlNode_->SetValue("path");
-    //     AddComment(*xmlNode_, "This file contains the evolution of a path over time. A path is represented by a sequence of states and a time index.");
-    // }
-}
-// void LocalMinimaNode::update()
-// {
-//     if(export_)
-//     {
-
-//         saveXML(xmlNode_);
-//         // TiXmlDocument xmlDoc;
-//         // xmlDoc_.LinkEndChild(xmlNode_);
-//         // std::string fn = "curve"+std::to_string(id_);
-//         // xmlDoc_.SaveFile(fn);
-//     }
-// }
-LocalMinimaNode::~LocalMinimaNode()
-{
-    // finish();
-}
-//void LocalMinimaNode::finish()
-//{
-//    if(export_)
-//    {
-//        saveXML(xmlNode_);
-//        xmlDoc_.LinkEndChild(xmlNode_);
-//        std::string fn = "disk_curve"+std::to_string(id_)+".path";
-
-//        xmlDoc_.SaveFile(fn);
-//        std::cout << "SAVE curve file to " << fn << std::endl;
-//    }
-//}
-
-//void LocalMinimaNode::saveXML(TiXmlElement *root_node)
-//{
-//    //Add time
-//    timePointEnd = ompl::time::now();
-//    ompl::time::duration timeDuration = timePointEnd - timePointStart;
-//    double duration = ompl::time::seconds(timeDuration);
-//    int timeInt = int(duration*25.0);
-//    std::string time = std::to_string(timeInt);
-
-//    bool timeExist = (std::find(updateTimes_.begin(), updateTimes_.end(), timeInt) != updateTimes_.end());
-//    if(timeExist) return;
-//    updateTimes_.push_back(timeInt);
-
-//    TiXmlElement* node = new TiXmlElement("keyframe");
-
-//    node->SetAttribute("time", time);
-
-//    if(hasStatesRepresentation)
-//    {
-//        unsigned int N = spath_.size();
-//        for(uint k = 0; k < N; k++)
-//        {
-//            TiXmlElement* subnode = new TiXmlElement("state");
-
-//            base::StateSpacePtr space = path_->getSpaceInformation()->getStateSpace();
-//            std::vector<double> state_serialized;
-//            base::State *state = spath_.at(k);
-//            space->copyToReals(state_serialized, state);
-//            std::stringstream ss;
-//            ss << state_serialized.size() << "  ";
-//            for(uint k = 0; k < state_serialized.size(); k++){
-//              ss << state_serialized.at(k) << " ";
-//            }
-//            TiXmlText text(ss.str().c_str());
-//            subnode->InsertEndChild(text);
-//            node->InsertEndChild(*subnode);
-//        }
-//    }
-
-
-//    root_node->InsertEndChild(*node);
-//}

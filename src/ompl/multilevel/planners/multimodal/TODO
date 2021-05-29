@@ -1,27 +1,6 @@
 [ ] Make sure that we always are cost non-increasing
 
-
-
 MOST PRESSING ISSUES:
-
-(1) What to do about non-converged minima?
-(2) Fix multilevel assignment of minima to classes
-
-Colorscheme: Env in light gray. Robot start in dark grey. Paths in light blue.
-Goal position in dark blue. 
-Configuration spaces in light grey (to have similarity to env). Paths there also
-in light blue, goal pos in dark blue. 
-Paths could also be gradient of color (to showcase in which direction the path
-goes!). Then we would color code robot as light blue, end pos as dark(er) blue?
-
----- Theory/Algorithmic Tasks
-
-[ ] How to address minima which have not yet been converged (example:
-03D_rod.xml). Ideas are either to do additional sweeps over database to update
-minima over time. Or use visibility checker? Or do nothing: argue that this is a
-problem of the OPTIMIZER. Our job is only to detect it and point it out.
-
-[ ] Relax assumption that optimizer always converges (idempotent).
 
 [ ] Implement the three different modes (call them differently. Extension
 strategy maybe)
@@ -48,14 +27,6 @@ understand. Better have that as a separate contribution.
   [ ] Make an automatic "render image" from current camera view by invoking
       bpy script! Could also be used to handle partial paths.
 
-[ ] Find better name for PathSpaceSparse. TreeBuilder. MultimodalExplorer.
-MultimodalBuilder. LocalMinimaSpanner. MultiPath.
-
-MMP--Multimodal Motion Planner
-
-Multimodal Sparse Roadmap (MULTISPARO)
-
-Rapidly-exploring random-tree (RRT) algorithm
 
 [ ] Interesting >3dof experiments (try to come up with examples which visualize
 different symbols)
@@ -77,4 +48,8 @@ center to faces.
 [x] Anytime thread-based (plus exhaustive mode)
 [x] Every non-const function of LMT should be mutexed
 [x] Fix Mobius State Space (interpolation seems off. Do 3d interpolation+projection)
+[x] Relax assumption that optimizer always converges (idempotent).
+[x] Find better name for PathSpaceSparse. TreeBuilder. MultimodalExplorer.
+MultimodalBuilder. LocalMinimaSpanner. MultiPath.
+
 

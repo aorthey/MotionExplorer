@@ -13,7 +13,6 @@
 #include <KrisLibrary/math/complex.h>
 #include <KrisLibrary/math3d/geometry3d.h>
 #include <KrisLibrary/math3d/basis.h>
-#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
 
 namespace ompl
 {
