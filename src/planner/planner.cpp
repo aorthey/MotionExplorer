@@ -679,6 +679,32 @@ CSpaceOMPL* MotionPlanner::GetCSpace()
   return cspace_levels.back();
 }
 
+void MotionPlanner::SmoothPath()
+{
+    // path = planners.at(active_planner)->GetPath();
+    // if(path){
+    //   path->Smooth(true);
+    // }
+  if(!active) return;
+  if(hasLocalMinimaTree())
+  {
+      viewLocalMinimaTree_->SmoothSelectedPath();
+  }else{
+    if(output != nullptr)
+    {
+      if(!hasLocalMinimaTree())
+      {
+          PathPiecewiseLinear* pwl = output->getSolutionPath(current_level);
+          if(pwl)
+          {
+              pwl->Smooth(true);
+          }
+      }
+    }
+    return;
+  }
+}
+
 PathPiecewiseLinear* MotionPlanner::GetPath()
 {
   if(!active) return nullptr;

@@ -64,9 +64,9 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
     //sparse roadmap parameters
     sparseDeltaFraction_ = 0.1; //original is 0.25 (SMLR). We used 0.15 for WAFR
     maxFailures_ = 5000;
-    epsilonPathEquivalence_ = 0.3;
+    epsilonPathEquivalence_ = 0.5;
     epsilonConvergenceThreshold_ = 1e-2;
-    NsubtresholdIterations_ = 10;
+    NsubtresholdIterations_ = 100;
 
     // Working for all, except the Kleinbottle
     // sparseDeltaFraction_ = 0.1;

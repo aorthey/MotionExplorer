@@ -8,7 +8,6 @@
   <robot name="schunk" file="../../robots/schunk/sdh.urdf" 
   config="18  -0.130317 -0.0879818 0.0876798 2.9787 1.4743 2.35701 0 0 -0.14 1.5708 0 0 -0.12 1.5708 0 0.22 1.5708 0 "/>
 
-
   <plannerinput>
 
     <agent 
@@ -18,24 +17,29 @@
       qMin="6  -0.2 -0.1 -0.0 0 0 0"
       qMax="6  +0.3 +0.3 +0.1 0 0 0"
     />
+
     <agent 
       id="1" 
-      qinit="18  -0.128523 -0.0882767 0.106465 2.9787 1.4743 2.35701 0 0 0 -0.2 0 0 0 -0.32 0 0 -0.02 0"
-      qgoal="18  -0.128523 -0.0882767 0.106465 2.9787 1.4743 2.35701 0 0 0 -0.2 0 0 0 -0.32 0 0 -0.02 0"
+      qinit="18  -0.128523 -0.0882767 0.106465 2.9787 1.4743 2.35701 0 0 0 -0.2 0 0 0 -0.32 0 0 +0.57 0"
+      qgoal="18  -0.128523 -0.0882767 0.106465 2.9787 1.4743 2.35701 0 0 0 -0.2 0 0 0 -0.32 0 0 +0.57 0"
       qMin="6  -0 -0 -0 0 0 0"
       qMax="6  +0 +0 +0 0 0 0"
     />
+
     <se3min config="6  -.2 -.1 -.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +.3 +.3 +.1 +3.141593 +1.57 +3.141593"/>
-    <algorithm name="multilevel:smlr"/>
-    <algorithm name="multilevel:qmp"/>
+
+    <algorithm name="multilevel:star"/>
+    <algorithm name="multilevel:biqrrt"/>
+    <algorithm name="ompl:rrtconnect"/>
     <algorithm name="multilevel:qrrt"/>
     <algorithm name="ompl:spars"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.15</maxplanningtime>      <!-- runtime in (s) --> 
     <pathBorderWidth>0.01</pathBorderWidth>
     <pathWidth>0.01</pathWidth>
+    <pathSpeed>8</pathSpeed>
     <multiAgent>1</multiAgent>
 
     <multilevel>
@@ -46,4 +50,5 @@
     </multilevel>
 
   </plannerinput>
+
 </world>

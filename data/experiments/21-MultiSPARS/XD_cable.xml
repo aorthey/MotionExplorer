@@ -77,6 +77,7 @@
     <se3min config="6  -3 -3 -0 -3.141593 0 0"/>
     <se3max config="6  +3 +3 +2 +3.141593 0 0"/>
 
+    <algorithm name="multilevel:star"/>
     <algorithm name="multilevel:qrrt"/>
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:smlr"/>

@@ -77,10 +77,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     hierarchy_change = true;
     path = planners.at(active_planner)->GetPath();
   }else if(cmd=="smooth_path"){
-    path = planners.at(active_planner)->GetPath();
-    if(path){
-      path->Smooth(true);
-    }
+    planners.at(active_planner)->SmoothPath();
+    // path = planners.at(active_planner)->GetPath();
+    // if(path){
+    //   path->Smooth(true);
+    // }
   }else if(cmd=="export_to_collada"){
     ExportToCollada();
   }else if(cmd=="draw_cover_single_open_set"){

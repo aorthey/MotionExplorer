@@ -35,27 +35,9 @@ namespace ompl
             LocalMinimaNode(base::SpaceInformationPtr si, VertexPath &vertices);
             ~LocalMinimaNode();
 
-            double getCost() const
-            {
-                return cost_.value();
-            }
-
-            void setVertexPath(VertexPath &vertices)
-            {
-                vpath_ = vertices;
-                hasVertexRepresentation = true;
-            }
-
-            void setPathPtr(base::PathPtr path)
-            {
-                path_ = path;
-                hasPathPtrRepresentation = true;
-
-                geometric::PathGeometricPtr gpath = 
-                  std::static_pointer_cast<geometric::PathGeometric>(path);
-                spath_ = gpath->getStates();
-                hasStatesRepresentation = true;
-            }
+            double getCost() const;
+            void setVertexPath(VertexPath &vertices);
+            void setPathPtr(base::PathPtr path);
 
             const StatesPath &asStates() const;
             StatesPath &asStatesNonConst();
@@ -63,37 +45,21 @@ namespace ompl
             const base::PathPtr &asPathPtr() const;
             base::PathPtr &asPathPtrNonConst();
 
-            void setCost(double c)
-            {
-                cost_ = base::Cost(c);
-            }
-
-            int getLevel() const
-            {
-                return level_;
-            }
-
-            void setLevel(int level)
-            {
-                level_ = level;
-            }
-
-            int getId() const
-            {
-              return id_;
-            }
-            //XML routines
+            void setCost(double c);
+            int getLevel() const;
+            void setLevel(int level);
+            int getId() const;
             void init();
 
             bool isConverged() const;
 
-            // void *customRepresentation{nullptr};
             PathPiecewiseLinear *customRepresentation{nullptr};
 
             int numberOfIdempotentUpdates_{0};
 
             void setNsubtresholdIterations(int);
 
+            int getNumberOfCostUpdates();
         private:
             // content
             base::Cost cost_;
@@ -115,6 +81,8 @@ namespace ompl
             base::PathPtr path_;
 
             LocalMinimaNode *parent_{nullptr};
+
+            int numberOfCostUpdates_{0};
 
             int NsubtresholdIterations_{10};
         };

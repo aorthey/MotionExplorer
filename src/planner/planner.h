@@ -37,6 +37,7 @@ class MotionPlanner{
 
     PlannerInput& GetInput();
     PathPiecewiseLinear* GetPath();
+    void SmoothPath();
     CSpaceOMPL* GetCSpace();
 
     //Ops on tree only, no interference with planner

@@ -66,6 +66,7 @@ class ViewLocalMinimaTree
 
     void DrawGLNodeUnSelected(GUIState& state, ompl::multilevel::LocalMinimaNode* node);
     void DrawGLNodeSelected(GUIState& state, ompl::multilevel::LocalMinimaNode* node);
+    void SmoothSelectedPath();
 
     void Save(const char* fn);
   private:

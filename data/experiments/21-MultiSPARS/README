@@ -5,7 +5,6 @@ Examples of infeasibility detection which would be useful
 CAGING: Maybe think about alternative necessary conditions!?
 One idea: use varava idea of covering SO3. 
 
-
 +Torus
 +Dubin's Car
 
@@ -26,7 +25,6 @@ what we need for fast multi-robot rearrangement planning.
 WHy is there no Sparse Bidirectional DDRRT ? Seems so obvious to do. Also Why
 not do multilevel sparse dynamic-domain asymtoptically optimal bidirectional
 RRT*?
---> Always concentrate on solving a real awesome problem!
 
 TODO:
 [ ] Clarify all experiments

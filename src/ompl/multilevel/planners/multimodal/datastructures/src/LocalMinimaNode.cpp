@@ -38,6 +38,28 @@ LocalMinimaNode::LocalMinimaNode(base::SpaceInformationPtr si, base::PathPtr pat
     init();
 }
 
+double LocalMinimaNode::getCost() const
+{
+    return cost_.value();
+}
+
+void LocalMinimaNode::setVertexPath(VertexPath &vertices)
+{
+    vpath_ = vertices;
+    hasVertexRepresentation = true;
+}
+
+void LocalMinimaNode::setPathPtr(base::PathPtr path)
+{
+    path_ = path;
+    hasPathPtrRepresentation = true;
+
+    geometric::PathGeometricPtr gpath = 
+      std::static_pointer_cast<geometric::PathGeometric>(path);
+    spath_ = gpath->getStates();
+    hasStatesRepresentation = true;
+}
+
 void LocalMinimaNode::init()
 {
     id_ = id_counter++;
@@ -101,3 +123,27 @@ const VertexPath &LocalMinimaNode::asVertices() const
     throw ompl::Exception("NYI");
 }
 
+void LocalMinimaNode::setCost(double c)
+{
+    numberOfCostUpdates_++;
+    cost_ = base::Cost(c);
+}
+
+int LocalMinimaNode::getLevel() const
+{
+    return level_;
+}
+
+void LocalMinimaNode::setLevel(int level)
+{
+    level_ = level;
+}
+
+int LocalMinimaNode::getId() const
+{
+    return id_;
+}
+int LocalMinimaNode::getNumberOfCostUpdates()
+{
+    return numberOfCostUpdates_;
+}

@@ -278,10 +278,11 @@ void LocalMinimaTree::printSelectedMinimum()
         int level = selectedMinimum_.size() - 1;
         int maxMinima = getNumberOfMinima(selectedMinimum_.size() - 1);
         int curMinimum = selectedMinimum_.back();
-        OMPL_DEVMSG1("Selected local minimum %d/%d (level %d, cost %.2f%s)", 
+        OMPL_DEVMSG1("Selected local minimum %d/%d (level %d, %d updates, cost %.2f%s)", 
           selectedMinimum_.back() + 1, 
           maxMinima, 
           level,
+          tree_.at(level).at(curMinimum)->getNumberOfCostUpdates(),
           tree_.at(level).at(curMinimum)->getCost(),
           (tree_.at(level).at(curMinimum)->isConverged()?
            ", [converged]":""));

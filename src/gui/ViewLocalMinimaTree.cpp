@@ -73,6 +73,16 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
   pathSelected_->DrawGL(state);
 
 }
+
+void ViewLocalMinimaTree::SmoothSelectedPath()
+{
+  LocalMinimaNode* node = localMinimaTree_->getSelectedPath();
+  pathSelected_ = static_cast<PathPiecewiseLinear*>(node->customRepresentation);
+  if(!pathSelected_) return;
+  pathSelected_->Smooth(true);
+  node->setPathPtr(pathSelected_->GetOMPLPath());
+}
+
 void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode* node)
 {
 

@@ -9,8 +9,10 @@
 
 #include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
 #include <ompl/multilevel/planners/multimodal/LocalMinimaSpanners.h>
+#include <ompl/multilevel/planners/qrrt/BiQRRT.h>
 #include <ompl/multilevel/planners/qrrt/QRRT.h>
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>
+#include <ompl/multilevel/planners/qrrt/STAR.h>
 #include <ompl/multilevel/planners/qmp/QMP.h>
 #include <ompl/multilevel/planners/qmp/QMPStar.h>
 #include <ompl/multilevel/planners/sparse/SMLR.h>
@@ -186,6 +188,8 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
 
   else if(algorithm=="multilevel:qrrt") planner = std::make_shared<om::QRRT>(siVec, "QRRT");
+  else if(algorithm=="multilevel:star") planner = std::make_shared<om::STAR>(siVec, "STAR");
+  else if(algorithm=="multilevel:biqrrt") planner = std::make_shared<om::BiQRRT>(siVec, "BiQRRT");
   else if(algorithm=="multilevel:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
   else if(algorithm=="multilevel:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
   else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");

@@ -4,13 +4,13 @@
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-     <mesh filename="tests/907758.stl"/>
+     <mesh filename="907758.stl"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <mesh filename="tests/907758.stl"/>
+      <mesh filename="907758.stl"/>
     </geometry>
   </visual>
   </link>

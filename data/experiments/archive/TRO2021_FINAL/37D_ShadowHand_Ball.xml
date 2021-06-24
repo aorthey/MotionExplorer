@@ -8,6 +8,7 @@
   <terrain file="../../../terrains/objects/tennisball.stl" translation="0.675 0.005 0.20" scale="0.4 0.4 0.4" rotateRPY="0 0 1.57">
     <display color="0.7 0.7 0.7 1"/>
   </terrain>
+
   <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_no_fingers.urdf"/>
   <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
   <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>

@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <world>
 
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand.urdf"/>
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>
 
-  <rigidObject file="../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
+  <rigidObject file="../../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
 
-  <terrain file="../../terrains/objects/beer_mug.tri" translation="0.975 0.005 0.22" scale="0.5 0.5 0.5" rotateRPY="0 0 1.57">
+  <terrain file="../../../terrains/objects/beer_mug.tri" translation="0.975 0.005 0.22" scale="0.5 0.5 0.5" rotateRPY="0 0 1.57">
     <display color="0.7 0.7 0.7 1"/>
   </terrain>
 
-  <terrain file="../../terrains/objects/Coffee_Table.tri" translation="1 0 0" scale="0.5 0.5 0.5">
+  <terrain file="../../../terrains/objects/Coffee_Table.tri" translation="1 0 0" scale="0.5 0.5 0.5">
     <display color="0.7 0.7 0.7 1"/>
   </terrain>
 

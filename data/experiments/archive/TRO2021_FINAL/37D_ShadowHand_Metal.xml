@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <world>
 
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand.urdf" />
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand.urdf" />
 
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_no_fingers.urdf"/>
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>
-  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb_middle.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_no_fingers.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>
+  <robot name="hand" file="../../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb_middle.urdf"/>
 
-  <terrain file="../../terrains/objects/metal.stl" translation="0.75 0 0.0" rotateRPY="0 0 1.57" scale="0.3 0.3 0.3">
+  <terrain file="../../../terrains/objects/metal.stl" translation="0.75 0 0.0" rotateRPY="0 0 1.57" scale="0.3 0.3 0.3">
     <display color="0.7 0.7 0.7 1"/>
   </terrain>
 
 
-  <rigidObject file="../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
+  <rigidObject file="../../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
 
   <plannerinput>
 

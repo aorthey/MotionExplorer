@@ -57,17 +57,28 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
 {
   for(uint vidx = 0; vidx < pd_->numVertices(); vidx++)
   {
+    glPointSize(sizeVertex);
+    setColor(cVertex);
+
     ob::PlannerDataVertex *vd = &pd_->getVertex(vidx);
     const om::PlannerDataVertexAnnotated *va = dynamic_cast<const om::PlannerDataVertexAnnotated*>(vd);
     if(va != nullptr)
     {
       if((int)va->getLevel() != current_level_) continue;
+      if(va->getComponent() > 1 && !state("draw_planner_rejected_samples"))
+      {
+        continue;
+      }
+
+      if(va->getComponent() == 1)
+      {
+        setColor(cVertexComponentGoal);
+      }else if(va->getComponent() > 1)
+      {
+        setColor(cVertexComponentOut);
+      }
     }
-
-    glPointSize(sizeVertex);
-    setColor(cVertex);
     glPushMatrix();
-
     
     Vector3 q = VectorFromVertex(vd, ridx);
 
@@ -126,7 +137,6 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
 
   glPushMatrix();
   glLineWidth(widthEdge);
-  setColor(cEdge);
 
   CSpaceOMPL *cspace = cspace_levels_.at(current_level_);
 
@@ -136,11 +146,20 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
 
   for(uint vidx = 0; vidx < pd_->numVertices(); vidx++)
   {
+    setColor(cEdge);
     ob::PlannerDataVertex *v = &pd_->getVertex(vidx);
     const om::PlannerDataVertexAnnotated *va = dynamic_cast<const om::PlannerDataVertexAnnotated*>(v);
     if(va != nullptr)
     {
       if((int)va->getLevel() != current_level_) continue;
+      if(va->getComponent() > 1 && !state("draw_planner_rejected_samples"))
+      {
+        continue;
+      }
+      if(va->getComponent() != 0)
+      {
+        setColor(cVertexComponentGoal);
+      }
     }
 
     const ob::State *vState;
