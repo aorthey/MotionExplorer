@@ -4,8 +4,8 @@ import subprocess
 from tri_primitives import MetaMesh
 import os, sys, re
 
-height = 0.2
-radius = 0.8
+height = 0.205
+radius = 4.60
 
 mesh = MetaMesh()
 mesh.AddCylinder(0,0,0, radius, height)

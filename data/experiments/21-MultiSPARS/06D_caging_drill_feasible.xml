@@ -38,6 +38,7 @@
     <multiAgent>1</multiAgent>
     <pathBorderWidth>0.01</pathBorderWidth>
     <pathWidth>0.01</pathWidth>
+    <pathSpeed>8</pathSpeed>
 
     <multilevel>
       <level>

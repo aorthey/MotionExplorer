@@ -36,6 +36,7 @@
     <freeFloating>1</freeFloating>
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
     <multiAgent>1</multiAgent>
+    <pathSpeed>8</pathSpeed>
 
     <multilevel>
       <level>

@@ -22,8 +22,7 @@
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.05</pathWidth>
 
-    <algorithm name="benchmark:icra2021"/>
-    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:star"/>
 
     <multilevel>
       <level robot_index="1" type="R3"/>

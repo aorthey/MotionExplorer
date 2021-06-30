@@ -29,7 +29,7 @@
     <pathBorderWidth>3</pathBorderWidth>
     <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
 
-    <algorithm name="multilevel:smlr"/>
+    <algorithm name="multilevel:star"/>
 
     <multilevel>
       <level robot_index="1" type="R3"/>

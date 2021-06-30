@@ -32,7 +32,7 @@ def attachTail(parentlinkname, linkname, xoffset):
 
 def createHead(linkname):
   # hstr = createSphere(linkname, 0, 0, 0, thickness)
-  hstr= createCylinder(linkname,+0.5*length_segment,0,0,radius =
+  hstr= createCylinder(linkname,0,0,0,radius =
       radius_cylinder,length=length_segment) 
   return hstr
 
@@ -48,9 +48,9 @@ def attachBranchSegment(parentlinkname, linkname, xoffset):
 def GetNsegmentString(Nsegments):
   branchname = "body"
   s = createHead(branchname+str(0))
-  xoffset = -(thickness + epsilon_gap)
+  xoffset = -(thickness + epsilon_gap + 0.5*length_segment)
   for i in range(0,Nsegments-1):
-    s+= attachBranchSegment(branchname+str(i),branchname+str(i+1), xoffset)
+    s += attachBranchSegment(branchname+str(i),branchname+str(i+1), xoffset)
     xoffset = -(length_segment + 2*radius_connector + epsilon_gap)
   # s+= attachTail(branchname+str(Nsegments-1), branchname+str(Nsegments), xoffset)
   return s
@@ -100,7 +100,3 @@ s+= '\"/>'
 
 
 print(s)
-
-
-
-

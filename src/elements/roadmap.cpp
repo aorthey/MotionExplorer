@@ -67,6 +67,7 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
       if((int)va->getLevel() != current_level_) continue;
       if(va->getComponent() > 1 && !state("draw_planner_rejected_samples"))
       {
+        std::cout << "REJECTED" << std::endl;
         continue;
       }
 

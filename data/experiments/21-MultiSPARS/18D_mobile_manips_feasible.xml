@@ -31,7 +31,7 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="multilevel:smlr"/>
+    <algorithm name="multilevel:star"/>
     <!-- <algorithm name="multilevel:qmp"/> -->
     <!-- <algorithm name="ompl:spars2"/> -->
     <!-- <algorithm name="ompl:spars"/> -->

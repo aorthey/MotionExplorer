@@ -34,7 +34,6 @@
     <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
 
     <algorithm name="multilevel:star"/>
-    <algorithm name="multilevel:smlr"/>
 
     <freeFloating>0</freeFloating>
     <maxplanningtime>2</maxplanningtime>

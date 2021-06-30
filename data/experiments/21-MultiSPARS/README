@@ -10,8 +10,10 @@ One idea: use varava idea of covering SO3.
 
 2 more missing
 
-[ ] Torus Infeasible/Feasible
-[ ] Visualize in Blender as Front-page figure
+[ ] Visualize Torus Example in Blender as Front-page figure
+[ ] Figure out (a) WHEN to stop and (b) WHAT guarantees we can give
+
+
 [ ] Dubin's car example (something more intricate than just narrow passage?)
 [ ] Add box/origami example, e.g. opening up a solar panel or something? (Why
 not preprogramming one motion?)

@@ -19,7 +19,7 @@
     <pathSpeed>12</pathSpeed>
     <threading>0</threading>
 
-    <algorithm name="multilevel:smlr"/>
+    <algorithm name="multilevel:star"/>
     <algorithm name="multilevel:qmpstar"/>
 
     <multilevel>

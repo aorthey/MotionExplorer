@@ -86,7 +86,8 @@
     <smoothPath>0</smoothPath>
 
     <multiAgent>1</multiAgent>
-    <algorithm name="multilevel:smlr"/>
+    <algorithm name="multilevel:star"/>
+    <algorithm name="multilevel:biqrrt"/>
 
     <multilevel>
       <level>
