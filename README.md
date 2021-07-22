@@ -1,25 +1,22 @@
 <h1>MotionExplorer</h1>
-<p align="middle">
-  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/airplane.png" width="280" />
-  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/PR2.png" width="280" />
-  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/drone.png" width="280" />
-</p>
 
+This is an experimental repository, which I use as a research platform to investigate <a href="https://sites.google.com/view/multimodaloptimization">multimodal optimization</a> and <a href="https://sites.google.com/view/multilevelmotionplanning">multilevel abstractions</a> in robot motion planning. You can find relevant papers also on my website <a href="https://aorthey.de">aorthey.de</a>. 
 
-Visualize Local Minima using a local minima tree. See <a href="https://arxiv.org/pdf/1909.05035.pdf">paper</a> for details.
+If you want to use any of this code in your own project, it is recommended that you write me an email (see <a href="https://aorthey.de">website</a>) or open an Issue.
 
-As input we use
-robots (in .urdf files) and objects/environments (in .tri or .stl files).
+<img src="https://user-images.githubusercontent.com/1220541/120098502-95c45980-c136-11eb-9953-90aa0183c2ae.gif" width="200"  height="200"/><img src="https://user-images.githubusercontent.com/1220541/120098586-09666680-c137-11eb-9284-0d30e7342551.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/1220541/120098587-0b302a00-c137-11eb-95ec-8a517cde5114.png" width="200" height="200"/>
 
-This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and adds local-minima visualization plus easier control through vim-like shortcuts.
-
-[1] Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
-
-[2] Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
+<img src="https://user-images.githubusercontent.com/1220541/120098608-31ee6080-c137-11eb-8e54-91a6ba1f6964.png" width="200"  height="200"/><img src="https://user-images.githubusercontent.com/1220541/120098620-3b77c880-c137-11eb-9041-a5f157717b08.png" width="200"  height="200"/>
 
 <h1>Install</h1>
 
 <h3>Dependencies</h3>
+
+This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and adds easier control through vim-like shortcuts.
+
+[1] Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
+
+[2] Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
 
 <ul>
   <li> OMPL 1.5.0 (modified version github.com/aorthey/ompl)
