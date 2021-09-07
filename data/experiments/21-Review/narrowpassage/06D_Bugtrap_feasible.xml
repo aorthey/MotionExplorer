@@ -29,6 +29,7 @@
     <pathBorderWidth>3</pathBorderWidth>
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
 
+    <algorithm name="multilevel:biqrrt"/>
     <algorithm name="benchmark:icra2021"/>
     <algorithm name="multilevel:smlr"/>
     <algorithm name="ompl:spars"/>

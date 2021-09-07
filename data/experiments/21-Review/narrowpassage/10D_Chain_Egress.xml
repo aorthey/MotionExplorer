@@ -7,7 +7,6 @@
 
   <terrain name="outrun" file="../../../terrains/outrun.tri" translation="0 0 0"/>
 
-
   <plannerinput>
 
     <!--
