@@ -1,0 +1,5 @@
+[ ] CLean up script, make it more flexible (i.e. write out to urdf/obj, write
+out to meshes, scale)
+
+[ ] Visualize local information during path execution
+
