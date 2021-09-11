@@ -35,9 +35,7 @@
     <smoothPath>0</smoothPath>
     <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
 
-    <algorithm name="multilevel:qmp"/>
-    <algorithm name="multilevel:qrrt"/>
-
+    <algorithm name="benchmark:review2021"/>
     <multilevel>
       <level robot_index="1" type="R3"/>
       <level robot_index="0" type="SE3RN"/>

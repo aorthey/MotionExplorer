@@ -45,11 +45,11 @@ bool GeometricCSpaceOMPLKleinBottle::IsPlanar(){
 void GeometricCSpaceOMPLKleinBottle::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
 
-  //We do not have an explicit inverse formula for Klein bottle. To still be
-  //able to project from points to UV states, we search through a set of grid
-  //points and find the one which is nearest to the point. Since we use this
-  //function only to project start/goal configurations, we do not slow down any
-  //algorithm.
+    //We do not have an explicit inverse formula for Klein bottle. To still be
+    //able to project from points to UV states, we search through a set of grid
+    //points and find the one which is nearest to the point. Since we use this
+    //function only to project start/goal configurations, we do not slow down any
+    //algorithm.
 
     Vector3 p(q[0],q[1],q[2]);
 
@@ -58,7 +58,7 @@ void GeometricCSpaceOMPLKleinBottle::ConfigToOMPLState(const Config &q, ob::Stat
     double u_best = 0;
 
     double dstep = 0.01;
-    for(double v = 0; v < 2*M_PI; v+=2*M_PI/8)
+    for(double v = -M_PI; v < M_PI; v+=2*M_PI/8)
     {
       for(double u = 0; u < M_PI; u+=dstep)
       {
@@ -74,7 +74,8 @@ void GeometricCSpaceOMPLKleinBottle::ConfigToOMPLState(const Config &q, ob::Stat
     }
 
     auto s = qompl->as<ob::KleinBottleStateSpace::StateType>();
-    s->setUV(u_best,v_best - M_PI);
+    s->setUV(u_best, v_best);
+    space->enforceBounds(s);
 }
 
 Vector3 GeometricCSpaceOMPLKleinBottle::ProjectToVector3(double u, double v)
@@ -112,7 +113,7 @@ void GeometricCSpaceOMPLKleinBottle::DrawGL(GUIState& state)
   for(double u = 0; u < M_PI; u+=dstep)
   {
     glBegin(GL_LINE_LOOP);
-    for(double v = 0; v < 2*M_PI; v+=2*M_PI/16)
+    for(double v = -M_PI; v < M_PI; v+=2*M_PI/16)
     {
       Vector3 p = ProjectToVector3(u, v);
       GLDraw::glVertex3v(p);
@@ -121,7 +122,7 @@ void GeometricCSpaceOMPLKleinBottle::DrawGL(GUIState& state)
   }
   //Vertical grid lines on bottle
   glLineWidth(3);
-  for(double v = 0; v < 2*M_PI; v+=2*M_PI/8)
+  for(double v = -M_PI; v < M_PI; v+=2*M_PI/8)
   {
     glBegin(GL_LINE_STRIP);
     for(double u = 0; u < M_PI; u+=dstep)

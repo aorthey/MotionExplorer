@@ -116,7 +116,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   std::string strkf = "stratification level"+to_string(0)+" feasible nodes INTEGER";
   run[strkf] = to_string(states);
 
-  std::cout << "Run " << pid << "/" << all_runs << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
+  std::cout << "Run " << pid+1 << "/" << all_runs << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 
 
@@ -193,7 +193,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="multilevel:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
   else if(algorithm=="multilevel:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
   else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::MultiSPARS>(siVec, "MultiSPARS");
+  else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::MultiSPARS>(siVec, "SMLR");
   else if(algorithm=="multilevel:smlr_old") planner = std::make_shared<om::SMLR>(siVec, "SMLR");
   else if(algorithm=="multilevel:drrt") planner = std::make_shared<om::DRRT>(siVec, "DRRT");
   else if(algorithm=="multilevel:tenet") planner = std::make_shared<om::TENET>(siVec, "TENET");
@@ -400,7 +400,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
   std::string environment_name = util::GetFileBasename(input.environment_name);
   std::string file_benchmark = environment_name+"_"+util::GetCurrentDateTimeString();
-  std::string output_file_without_extension = util::GetDataFolder()+"/benchmarks/"+file_benchmark;
+  std::string output_file_without_extension = util::GetDataFolder()+"/benchmarks/Review2021/"+file_benchmark;
   std::string log_file = output_file_without_extension+".log";
   std::string xml_file = output_file_without_extension+".xml";
   std::string xml_file_minimal = util::GetDataFolder()+"/benchmarks/"+environment_name+".xml";
