@@ -4,7 +4,7 @@
 GeometricCSpaceOMPLSE2Dubin::GeometricCSpaceOMPLSE2Dubin(RobotWorld *world_, int robot_idx):
   BaseT(world_, robot_idx)
 {
-    turningRadius_ = 0.5;
+    turningRadius_ = 0.2;
 }
 
 void GeometricCSpaceOMPLSE2Dubin::initSpace()

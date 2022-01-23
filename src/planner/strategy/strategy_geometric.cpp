@@ -173,7 +173,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
 
-  else if(algorithm=="ompl:cforest") planner = std::make_shared<og::CForest>(si);
+  else if(algorithm=="ompl:cforest"){
+    planner = std::make_shared<og::CForest>(si);
+    //Set to single-thread to force non-parallel
+    static_pointer_cast<og::CForest>(planner)->setNumThreads(1);
+  }
   else if(algorithm=="ompl:sst") planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") planner = std::make_shared<og::PDST>(si);
   else if(algorithm=="ompl:stride") planner = std::make_shared<og::STRIDE>(si);

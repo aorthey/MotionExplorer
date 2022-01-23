@@ -23,12 +23,13 @@ ELSE()
 ENDIF()
 
 MESSAGE(COLOR_WHITE ${DEPENDENCIES})
-SET(CMAKE_BUILD_TYPE Debug)
 
 ###############################################################################
 MESSAGE("${CMAKE_MODULE_PATH}")
 ###############################################################################
 ### OMPL REquirements: CMAKE 2.8.7, Eigen 3.3, Boost 1.55
+#SET(CMAKE_BUILD_TYPE Debug)
+#SET( CMAKE_BUILD_TYPE Release)
 ADD_SUBDIRECTORY(libs/ompl)
 SET(OMPL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/libs/ompl/src/ompl/")
 INCLUDE_DIRECTORIES(SYSTEM "${OMPL_INCLUDE_DIRS}")

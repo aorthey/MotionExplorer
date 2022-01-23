@@ -1,45 +1,32 @@
 <benchmarks>
-
-  <benchmark name="best_geometric">
-    <algorithm name="multilevel:qng_goal_directed"/>
-    <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:kpiece"/>
-    <!-- <algorithm name="ompl:prm"/> -->
-    <!-- <algorithm name="ompl:est"/> -->
-    <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>5</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
-  </benchmark>
-
-  <benchmark name="contact">
-    <!-- <algorithm name="ompl:rrt"/> -->
-    <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:prm"/>
-    <!-- <algorithm name="ompl:lazyprm"/> -->
-    <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) -->
-    <runcount>2</runcount> <!-- number of runs per algorithm -->
+  <benchmark name="review2021_dubins">
+    <!-- State space is asymmetric, cannot use PRM, or bidirectional planner
+         here -->
+    <maxplanningtime>20</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
-  </benchmark>
 
-  <benchmark name="icra2021">
-    <algorithm name="multilevel:smlr"/>
-    <!-- <algorithm name="ompl:spars"/> -->
-    <!-- <algorithm name="ompl:spars2"/> -->
-    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
-  </benchmark>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:rrtstar"/>
+    <algorithm name="ompl:rrtxstatic"/>
+    <algorithm name="ompl:lazyrrt"/>
+    <algorithm name="ompl:trrt"/>
+    <algorithm name="ompl:lbtrrt"/>
+    <algorithm name="ompl:lazylbtrrt"/>
 
-  <benchmark name="rss2021">
-    <algorithm name="multilevel:minimaspanner"/>
-    <maxplanningtime>120</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
+    <algorithm name="ompl:fmt"/>
+
+    <algorithm name="ompl:rlrt"/>
+    <algorithm name="ompl:sst"/>
+    <algorithm name="ompl:est"/>
+
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qrrtstar"/>
   </benchmark>
 
   <benchmark name="review2021_manifolds">
-    <maxplanningtime>1</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>1</runcount> <!-- number of runs per algorithm --> 
+    <maxplanningtime>20</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
 
     <algorithm name="ompl:rrt"/>
@@ -96,7 +83,7 @@
   </benchmark>
 
   <benchmark name="review2021">
-    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
+    <maxplanningtime>20</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
 
@@ -154,67 +141,22 @@
     <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
   </benchmark>
 
-  <!-- complete benchmark of all planners -->
-  <benchmark name="all_geometric">
 
-    <!-- <algorithm name="multilevel:qrrt"/> -->
-    <!-- <algorithm name="multilevel:qrrtstar"/> -->
-    <!-- <algorithm name="multilevel:qmp"/> -->
-    <!-- <algorithm name="multilevel:qmpstar"/> -->
-    <!-- <algorithm name="multilevel:spqr"/> -->
-
-    <!-- <algorithm name="ompl:rrt"/> -->
-    <!-- <algorithm name="ompl:rrtconnect"/> -->
-    <!-- <algorithm name="ompl:rrtstar"/> -->
-    <!-- <algorithm name="ompl:rrtxstatic"/> -->
-    <!-- <algorithm name="ompl:lazyrrt"/> -->
-    <!-- <algorithm name="ompl:trrt"/> -->
-    <!-- <algorithm name="ompl:btrrt"/> -->
-    <!-- <algorithm name="ompl:lbtrrt"/> -->
-
-    <!-- <algorithm name="ompl:fmt"/> -->
-    <!-- <algorithm name="ompl:bfmt"/> -->
-
-    <!-- <algorithm name="ompl:prm"/> -->
-    <!-- <algorithm name="ompl:prmstar"/> -->
-    <!-- <algorithm name="ompl:lazyprm"/> -->
-    <!-- <algorithm name="ompl:lazyprmstar"/> -->
-    <!-- <algorithm name="ompl:spars"/> -->
-    <!-- <algorithm name="ompl:spars2"/> -->
-    <!-- <algorithm name="ompl:sst"/> -->
-    <!-- <algorithm name="ompl:est"/> -->
-    <!-- <algorithm name="ompl:biest"/> -->
-
-    <!-- PROJECTION PLANNER (or not multi-robot enabled)-->
-    <!-- <algorithm name="ompl:cforest"/> -->
-    <!-- <algorithm name="ompl:sorrtstar"/> -->
-    <!-- <algorithm name="ompl:informedrrtstar"/> -->
-    <!-- <algorithm name="ompl:bitstar"/>  -->
-    <!-- <algorithm name="ompl:projest"/> -->
-    <!-- <algorithm name="ompl:pdst"/> -->
-    <!-- <algorithm name="ompl:stride"/> -->
-    <!-- <algorithm name="ompl:kpiece"/> -->
-    <!-- <algorithm name="ompl:bkpiece"/> -->
-    <!-- <algorithm name="ompl:lbkpiece"/> -->
-    <!-- <algorithm name="ompl:sbl"/> -->
-
-    <!-- FAULTY PLANNERS -->
-    <!-- <algorithm name="ompl:prrt"/> RETURNS INFEASIBLE PATH -->
-    <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
-
-    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
+  <benchmark name="review2021_projections">
+    <maxplanningtime>20</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
-  </benchmark>
-
-  <benchmark name="all_dynamic">
-    <algorithm dynamic="1" name="ompl:est"/>
-    <algorithm dynamic="1" name="ompl:sst"/>
-    <algorithm dynamic="1" name="ompl:pdst"/>
-    <algorithm dynamic="1" name="ompl:rrt"/>
-    <algorithm dynamic="1" name="ompl:kpiece"/>
-    <maxplanningtime>30</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>2</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>10000</maxmemory> <!-- max memory (MB) per run of algorithm--> 
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qrrtstar"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qmpstar"/>
+    <algorithm name="multilevel:smlr"/>
+    <algorithm name="ompl:projest"/>
+    <algorithm name="ompl:pdst"/>
+    <algorithm name="ompl:stride"/>
+    <algorithm name="ompl:sbl"/>
+    <algorithm name="ompl:kpiece"/>
+    <algorithm name="ompl:bkpiece"/>
+    <algorithm name="ompl:lbkpiece"/>
   </benchmark>
 </benchmarks>

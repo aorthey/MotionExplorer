@@ -541,7 +541,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
           if(!found){
             current_lvl_ids.push_back(-1);
             type.push_back("EMPTY_SET");
-            controllable.push_back(0);
+            controllable.push_back(1);
             freeFloating.push_back(false);
           }
         }

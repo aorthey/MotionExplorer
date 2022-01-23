@@ -1,24 +1,16 @@
 <?xml version="1.0"?>
 <world>
 
-  <robot name="kuka_lwr"        file="../../robots/kuka_lwr/kuka_windshield.urdf"/>
-  <robot name="kuka_lwr_1links" file="../../robots/kuka_lwr/kuka_1links.urdf"/>
-  <robot name="kuka_lwr_2links" file="../../robots/kuka_lwr/kuka_2links.urdf"/>
-  <robot name="kuka_lwr_3links" file="../../robots/kuka_lwr/kuka_3links.urdf"/>
-  <robot name="kuka_lwr_4links" file="../../robots/kuka_lwr/kuka_4links.urdf"/>
-  <robot name="kuka_lwr_5links" file="../../robots/kuka_lwr/kuka_5links.urdf"/>
+  <robot name="kuka_lwr"        file="../../../robots/kuka_lwr/kuka_windshield.urdf"/>
 
-  <terrain name="cuboid.tri" file="../../terrains/primitives/cuboid.tri" scale="0.1 1 1" translation="0 0 0.75">
+  <terrain name="cuboid.tri" file="../../../terrains/primitives/cuboid.tri" scale="0.1 1 1" translation="0 0 0.75">
     <display color="0.8 0.8 0.8 1"/>
   </terrain>
 
-  <!-- <terrain name="cuboid.tri" file="../../terrains/primitives/cuboid.tri" scale="0.1 0.4 1" translation="0 -0.6 0.25"> -->
-  <!--   <display color="0.8 0.8 0.8 1"/> -->
-  <!-- </terrain> -->
-  <terrain name="cuboid.tri" file="../../terrains/primitives/cuboid.tri" scale="0.1 0.4 1" translation="0 +0.6 0.25">
+<terrain name="cuboid.tri" file="../../../terrains/primitives/cuboid.tri" scale="0.1 0.4 1" translation="0 +0.6 0.25">
     <display color="0.8 0.8 0.8 1"/>
   </terrain>
-  <terrain name="plane.tri" file="../../terrains/primitives/plane.tri" scale="1 1 1" translation="0 0 -0.01">
+  <terrain name="plane.tri" file="../../../terrains/primitives/plane.tri" scale="1 1 1" translation="0 0 -0.01">
     <display color="0.8 0.8 0.8 1"/>
   </terrain>
 
@@ -33,6 +25,7 @@
     <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
 
+    <algorithm name="benchmark:review2021"/>
     <algorithm name="benchmark:icra2021"/>
     <algorithm name="multilevel:smlr"/>
 
@@ -42,7 +35,6 @@
     <pathWidth>0.05</pathWidth>
 
     <multilevel>
-      <level robot_index="2" type="R2"/>
       <level robot_index="0" type="R7"/>
     </multilevel>
 

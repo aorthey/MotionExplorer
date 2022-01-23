@@ -19,5 +19,4 @@ do
       ./planner_standalone $f
     fi
   fi
-  sleep 2
 done;
