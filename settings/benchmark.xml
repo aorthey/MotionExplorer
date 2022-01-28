@@ -25,19 +25,16 @@
   </benchmark>
 
   <benchmark name="review2021_manifolds">
-    <maxplanningtime>20</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>2</runcount> <!-- number of runs per algorithm --> 
+    <maxplanningtime>1</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
 
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrtstar"/>
     <algorithm name="ompl:rrtxstatic"/>
-    <algorithm name="ompl:lazyrrt"/>
     <algorithm name="ompl:trrt"/>
     <algorithm name="ompl:btrrt"/>
-    <algorithm name="ompl:lbtrrt"/>
-    <algorithm name="ompl:lazylbtrrt"/>
 
     <algorithm name="ompl:fmt"/>
     <algorithm name="ompl:bfmt"/>
@@ -47,19 +44,9 @@
 
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:prmstar"/>
-    <algorithm name="ompl:lazyprm"/>
-    <algorithm name="ompl:lazyprmstar"/>
-    <algorithm name="ompl:spars"/>
-    <algorithm name="ompl:spars2"/>
     <algorithm name="ompl:sst"/>
     <algorithm name="ompl:est"/>
     <algorithm name="ompl:biest"/>
-
-    <algorithm name="multilevel:qrrt"/>
-    <algorithm name="multilevel:qrrtstar"/>
-    <algorithm name="multilevel:qmp"/>
-    <algorithm name="multilevel:qmpstar"/>
-    <algorithm name="multilevel:smlr"/>
 
     <!-- PLANNER not supporting general manifolds -->
     <!-- <algorithm name="ompl:cforest"/> -->

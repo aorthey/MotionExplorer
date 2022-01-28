@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="panda" file="../../../robots/FrankaEmica/panda.urdf" />
+
+
+  <!-- <terrain name="cuboid.tri" file="../../terrains/primitives/cuboid.tri" scale="0.1 1 1" translation="0 0 0.75"> -->
+  <!--   <display color="0.8 0.8 0.8 1"/> -->
+  <!-- </terrain> -->
+  <!-- <terrain name="plane.tri" file="../../terrains/primitives/plane.tri" scale="1 1 1" translation="0 0 -0.01"> -->
+  <!--   <display color="0.8 0.8 0.8 1"/> -->
+  <!-- </terrain> -->
+
+  <terrain file="../../../terrains/objects/boxed.tri" translation="1 +0.15 -0.1" scale="0.5 0.5 0.5">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+  <plannerinput>
+    <qinit config="17  0 0 0 0 0 0 -2.9671 -0.7274 6.93889e-18 -0.86 0.06 3.2423 2.74 0 0 0.04 0.03 "/>
+
+    <qgoal config="17  0 0 0 0 0 0 -2.9671 -0.9926 -2.9671 -1.04 -0.4529 2.0727 1.2071 0 0 0.04 0.03 "/>
+
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+    <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
+
+    <algorithm name="benchmark:review2021"/>
+    <algorithm name="multilevel:smlr"/>
+    <algorithm name="ompl:rrtconnect"/>
+
+    <freeFloating>0</freeFloating>
+    <maxplanningtime>2</maxplanningtime>
+    <epsilongoalregion>0.05</epsilongoalregion>
+    <pathWidth>0.05</pathWidth>
+
+    <multilevel>
+      <level robot_index="0" type="R8"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

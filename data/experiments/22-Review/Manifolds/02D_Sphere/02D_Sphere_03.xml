@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<world>
+
+<robot name="point" file="../../../../robots/point_nonphysical.urdf"/>
+
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="-0.7645434053599999 0.5265246565269499 -0.3718133502037175"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="-0.6887397881258576 -0.3174879830441004 0.6517966591468061"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="-0.1258061340095333 -0.9766417589981136 0.17419440641606732"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="0.3689446549738399 -0.18448875567835882 -0.9109575953876695"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="0.5033141146288844 0.5425963293591953 -0.6725058552765694"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="-0.17166722443707957 -0.7888892920389982 -0.5900712236334504"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="0.7126470660389014 0.3941119292910921 0.5803532945168822"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="0.9994358686338553 -0.033574665892475444 -0.0008284312282837261"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="-0.7921789989346709 -0.22274336027113537 -0.5681881986648314"/>
+<rigidObject name="cylinder_difference"         file="../../../../terrains/primitives/sphere.tri"        translation="0.273163543202958 -0.6525558917441475 0.7067902707414739"/>
+
+<plannerinput>
+
+  <qinit  config="6  0.48188397204351785 -0.8300766168738681 -0.28064327465092676 0 0 0"/>
+  <qgoal  config="6  -0.48188397204351785 0.8300766168738681 0.28064327465092676 0 0 0 "/>
+  <se3min config="6  -3 -3 -3 -3.141593 -1.57 -3.141593"/>
+  <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
+  <epsilongoalregion>0.01</epsilongoalregion>
+  <freeFloating>1</freeFloating>
+  <algorithm name="benchmark:review2021_manifolds"/>
+  <multilevel>
+    <level robot_index="0" type="SPHERE"/>
+  </multilevel>
+</plannerinput>
+
+</world>
+

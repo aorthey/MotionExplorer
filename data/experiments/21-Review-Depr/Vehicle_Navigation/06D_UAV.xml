@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="uav" file="../../../robots/submarine/uav.urdf"/>
+  <rigidObject name="rocks" file="../../../terrains/underwater/underwater.stl" translation="0 0 0"/>
+    
+  <plannerinput>
+
+    <qinit  config="6  -2 +5 +0.2 0 0 0"/>
+    <dqinit config="6 3 0 0 0 0 0 "/>
+    <qgoal  config="6  -2 +0 +0.4 2.43 0 0"/>
+    <dqgoal config="6 3 0 0 0 0 0 "/>
+
+    <se3min config="6  -5.0 -2.0 -0.0 -3.141593 -0.01 -0.01"/>
+    <se3max config="6  +4.0 +7.0 +1.0 +3.141593 +0.01 +0.01"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <pathSpeed>10</pathSpeed>
+    <pathWidth>0.3</pathWidth>
+
+    <algorithm name="benchmark:review2021_manifolds"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <multilevel>
+      <level robot_index="0" freeFloating="1" type="SE3C"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

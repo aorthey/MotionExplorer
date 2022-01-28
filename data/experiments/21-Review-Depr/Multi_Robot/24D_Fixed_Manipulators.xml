@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="panda1" file="../../../robots/FrankaEmica/panda.urdf" 
+    config="17  0 0.7 0 0 0 0 -1.8 0.42 0.18 -1.8 0.1 2.46 0.6 0 0 0.04 0 "
+    />
+  <robot name="panda2" file="../../../robots/FrankaEmica/panda.urdf" 
+    config="17 0.61 -0.35 0 0 0 0 0 0 0 0 -0.3 3.1 0.76 0 0 0.04 0"
+    />
+  <robot name="panda3" file="../../../robots/FrankaEmica/panda.urdf" 
+    config="17 -0.61 -0.35 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0 "
+    />
+
+  <rigidObject file="../../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
+
+  <terrain file="../../../terrains/objects/Coffee_Table.tri" translation="0 0 0" scale="0.5 0.5 0.5">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+  <plannerinput>
+    <agent 
+      id="0" 
+      qinit="17 0 0.7 0 0 0 0 0 0 0 0 -0.3 3.1 0.76 0 0 0.04 0"
+      qgoal="17  0 0.7 0 0 0 0 -1.8 0.42 0.18 -1.8 0.1 2.46 0.6 0 0 0.04 0 "
+    />
+    <agent 
+      id="1" 
+      qinit="17 0.61 -0.35 0 0 0 0 0 0 0 0 -0.3 3.1 0.76 0 0 0.04 0"
+      qgoal="17  0.61 -0.35 0 0 0 0 2.7471 1.28 0.22 -0.42 -0.2 3.1 0.76 0 0 0.04 0 "
+    />
+    <agent 
+      id="2" 
+      qinit="17 -0.61 -0.35 0 0 0 0 0 0 0 0 -0.3 3.1 0.76 0 0 0.04 0"
+      qgoal="17  -0.61 -0.35 0 0 0 0 0.36 0.86 0 -0.54 0 1.54 0 0 0 0.04 0 "
+    />
+
+    <epsilongoalregion>0.01</epsilongoalregion>
+      
+    <se3min config="6  -3.0 -2 -0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3.0 +2 +0 +3.141593 +1.57 +3.141593"/>
+
+    <pathBorderWidth>0.005</pathBorderWidth>
+    <pathWidth>0.01</pathWidth>
+    <pathSpeed>2</pathSpeed>
+    <maxplanningtime>2</maxplanningtime>
+
+    <algorithm name="benchmark:review2021_manifolds"/>
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="0" type="R8"/>
+        <robot id="1" freeFloating="0" type="R8"/>
+        <robot id="2" freeFloating="0" type="R8"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

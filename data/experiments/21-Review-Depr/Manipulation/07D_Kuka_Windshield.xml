@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="kuka_lwr"        file="../../../robots/kuka_lwr/kuka_windshield.urdf"/>
+
+  <terrain name="cuboid.tri" file="../../../terrains/primitives/cuboid.tri" scale="0.1 1 1" translation="0 0 0.75">
+    <display color="0.8 0.8 0.8 1"/>
+  </terrain>
+
+<terrain name="cuboid.tri" file="../../../terrains/primitives/cuboid.tri" scale="0.1 0.4 1" translation="0 +0.6 0.25">
+    <display color="0.8 0.8 0.8 1"/>
+  </terrain>
+  <terrain name="plane.tri" file="../../../terrains/primitives/plane.tri" scale="1 1 1" translation="0 0 -0.01">
+    <display color="0.8 0.8 0.8 1"/>
+  </terrain>
+
+  <plannerinput>
+    <qinit config="14  0 0 0 0 0 0 2.94 1.2508 1.52 -0.3 -1.48 1.6544 0.1 0"/>
+    <qgoal config="14  0 0 0 0 0 0 -0.05 1.3 0.34 0.56 -0.17 1.6144 -0.26 0 "/>
+
+    <!-- 14  0 -0.298911 0 6.28319 -0 6.28319 -0.02 1.3 0.34 0.56 -0.17 1.6144 -0.26 0 --> 
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+    <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
+
+    <algorithm name="ompl:lazylbtrrt"/>
+    <algorithm name="benchmark:review2021"/>
+
+    <freeFloating>0</freeFloating>
+    <maxplanningtime>10</maxplanningtime>
+    <epsilongoalregion>0.05</epsilongoalregion>
+    <pathWidth>0.05</pathWidth>
+
+    <multilevel>
+      <level robot_index="0" type="R7"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

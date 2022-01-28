@@ -1,9 +1,8 @@
-CUR_PATH=`pwd`
 cd ../../build/
 make -j4 planner_standalone
 # make -j4 planner_standalone
 # for d in ../data/experiments/21-Review/*
-for d in ../data/experiments/21-Review/*
+for d in ../data/experiments/22-Review/Manifolds/*
 do 
   if [[ -d $d ]]; then
     for f in $d/*

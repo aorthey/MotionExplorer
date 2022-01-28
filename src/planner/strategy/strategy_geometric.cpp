@@ -35,6 +35,7 @@
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/LazyLBTRRT.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
+#include <ompl/tools/benchmark/Benchmark.h>
 
 #include <ompl/geometric/planners/rlrt/RLRT.h>
 #include <ompl/geometric/planners/rlrt/BiRLRT.h>
@@ -130,10 +131,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
       run[strm] = to_string(localMinimaTree->getNumberOfMinima());
       std::cout << "Minima found: " << localMinimaTree->getNumberOfMinima() << std::endl;
   }
-
-
   pid++;
-
 }
 
 ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
@@ -418,7 +416,9 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   }
 
   og::SimpleSetup ss(si);
-  ot::Benchmark benchmark(ss, environment_name);
+  ot::Benchmark benchmark(ss, "Sphere");
+
+  // std::cout << environment_name << std::endl;
 
   uint planner_ctr = 0;
   for(uint k = 0; k < binput.algorithms.size(); k++)
@@ -499,14 +499,6 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   ss.getProblemDefinition()->setOptimizationObjective( GetOptimizationObjective(si) );
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );
 
-  ot::Benchmark::Request req;
-  req.maxTime = binput.maxPlanningTime;
-  req.maxMem = binput.maxMemory;
-  req.runCount = binput.runCount;
-  // req.useThreads = false;
-  req.simplify = false;
-  req.displayProgress = true;
-
   benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
 
   //############################################################################
@@ -538,13 +530,35 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   std::cout << std::string(80, '-') << std::endl;
   //############################################################################
 
+  ot::Benchmark::Request req;
+  req.maxTime = binput.maxPlanningTime;
+  req.maxMem = binput.maxMemory;
+  req.runCount = binput.runCount;
+  // req.useThreads = false;
+  req.simplify = false;
+  req.displayProgress = true;
 
   benchmark.benchmark(req);
   benchmark.saveResultsToFile(log_file.c_str());
+  const auto exp = benchmark.getRecordedExperimentData();
+  std::cout << exp.name << std::endl;
+  std::cout << exp.host << std::endl;
 
-  BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
-  boutput.Save(xml_file.c_str());
-  boutput.PrintPDF();
+  boost::filesystem::path database_path(log_file);
+  database_path.replace_extension("db");
+
+  std::string to_database_cmd = std::string("python ../libs/ompl/scripts/ompl_benchmark_statistics.py ")+log_file.c_str()+std::string(" -d ") + database_path.c_str();
+
+  rvalue = std::system(to_database_cmd.c_str());
+
+  if(rvalue){
+      std::cout << "Successfully converted .log to .db" << std::endl;
+  }else{
+      std::cout << "### [ERROR] Benchmark to database failed" << std::endl;
+  }
+  // BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
+  // boutput.Save(xml_file.c_str());
+  // boutput.PrintPDF();
 
   // boutput.Save(xml_file_minimal.c_str());
   // boutput.PrintPDF();
