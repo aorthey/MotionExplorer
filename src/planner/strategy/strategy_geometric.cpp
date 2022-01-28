@@ -416,7 +416,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   }
 
   og::SimpleSetup ss(si);
-  ot::Benchmark benchmark(ss, "Sphere");
+  ot::Benchmark benchmark(ss, environment_name);
 
   // std::cout << environment_name << std::endl;
 
