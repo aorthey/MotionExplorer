@@ -1,29 +1,4 @@
 <benchmarks>
-  <benchmark name="review2021_dubins">
-    <!-- State space is asymmetric, cannot use PRM, or bidirectional planner
-         here -->
-    <maxplanningtime>20</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>2</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
-
-    <algorithm name="ompl:rrt"/>
-    <algorithm name="ompl:rrtstar"/>
-    <algorithm name="ompl:rrtxstatic"/>
-    <algorithm name="ompl:lazyrrt"/>
-    <algorithm name="ompl:trrt"/>
-    <algorithm name="ompl:lbtrrt"/>
-    <algorithm name="ompl:lazylbtrrt"/>
-
-    <algorithm name="ompl:fmt"/>
-
-    <algorithm name="ompl:rlrt"/>
-    <algorithm name="ompl:sst"/>
-    <algorithm name="ompl:est"/>
-
-    <algorithm name="multilevel:qrrt"/>
-    <algorithm name="multilevel:qrrtstar"/>
-  </benchmark>
-
   <benchmark name="review2021_manifolds">
     <maxplanningtime>1</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
@@ -35,6 +10,7 @@
     <algorithm name="ompl:rrtxstatic"/>
     <algorithm name="ompl:trrt"/>
     <algorithm name="ompl:btrrt"/>
+    <algorithm name="ompl:lbtrrt"/> <!-- Lower bound Trees -->
 
     <algorithm name="ompl:fmt"/>
     <algorithm name="ompl:bfmt"/>

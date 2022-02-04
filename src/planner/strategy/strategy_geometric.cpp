@@ -87,7 +87,10 @@ static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInfo
   // opt->addObjective(clearObj, 1.0);
   // opt->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
 
-  lengthObj->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
+  // Cost Threshold = 0 -> Optimize until time limit reached
+  // Cost Threshold = +inf -> Return first feasible solution
+  lengthObj->setCostThreshold(ob::Cost(0.0));
+  // lengthObj->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
 
   return ob::OptimizationObjectivePtr(lengthObj);
 }
@@ -402,7 +405,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
   std::string environment_name = util::GetFileBasename(input.environment_name);
   std::string file_benchmark = environment_name+"_"+util::GetCurrentDateTimeString();
-  std::string output_file_without_extension = util::GetDataFolder()+"/benchmarks/Review2021/"+file_benchmark;
+  std::string output_file_without_extension = util::GetDataFolder()+"/benchmarks/22-Review/"+file_benchmark;
   std::string log_file = output_file_without_extension+".log";
   std::string xml_file = output_file_without_extension+".xml";
   std::string xml_file_minimal = util::GetDataFolder()+"/benchmarks/"+environment_name+".xml";
@@ -417,8 +420,6 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
   og::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, environment_name);
-
-  // std::cout << environment_name << std::endl;
 
   uint planner_ctr = 0;
   for(uint k = 0; k < binput.algorithms.size(); k++)
@@ -534,6 +535,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   req.maxTime = binput.maxPlanningTime;
   req.maxMem = binput.maxMemory;
   req.runCount = binput.runCount;
+  req.timeBetweenUpdates = 0.01; //default 0.05
   // req.useThreads = false;
   req.simplify = false;
   req.displayProgress = true;
